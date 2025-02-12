@@ -1,0 +1,55 @@
+{% extends "base.html" %} {% block body %}
+<div class="container col-md-4 col-md-offset-4">
+  <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
+    <form method="Post">
+      <h3 align="center">Signup</h3>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          name="email"
+          class="form-control"
+          placeholder="sam@gmail.com"
+          type="email"
+          focus
+        />
+      </div>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          id="name"
+          name="name"
+          class="form-control"
+          placeholder="Sam Smith"
+          type="text"
+        />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          class="form-control"
+          placeholder="password"
+          type="password"
+        />
+      </div>
+      <div class="form-group">
+        <label for="password2">Password (Confirm)</label>
+        <input
+          id="password2"
+          name="password2"
+          class="form-control"
+          placeholder="password"
+          type="password"
+        />
+      </div>
+      <br />
+      <button type="submit" class="btn btn-outline-success">Submit</button>
+      <div class="form-group">
+        <p>Already have account? <a href="/login">Login</a> here</p>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
