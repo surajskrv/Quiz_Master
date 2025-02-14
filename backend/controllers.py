@@ -1,17 +1,16 @@
-from flask import render_template, redirect,request
-from backend.models import *
 from flask import current_app as app
-from flask import flash
-from wtforms import Form, StringField, PasswordField, validators
-import re
+from flask import render_template, redirect, request, flash
+from flask_login import login_user, logout_user, login_required, current_user
+from backend.models import *
+from werkzeug.security import check_password_hash, generate_password_hash
 
-def is_valid_email(email):
-    regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-    return re.match(regex, email) is not None
-
+@login_required
 @app.route('/')
 def home():
-    return render_template('home.html')
+    if current_user.is_authenticated:
+        return render_template("user.html", user=current_user)
+    else:
+        return redirect("/login")
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -21,22 +20,23 @@ def login():
         
         if not email:
             flash("Email is required.", category='error')
-        elif not is_valid_email(email):
-            flash("Invalid email format.", category='error')
         elif not password:
             flash("Password is required.", category='error')
         else:
             user = User.query.filter_by(email=email).first()
-            if user:
-                if user.password == password:
+            if user.email == 'admin@gmail.com':
+                return redirect('/admin')
+            elif user:
+                if check_password_hash(user.password, password):
                     flash("Logged in", category='success')
+                    login_user(user, remember=True)
+                    current_user.authenticated = True
                     return redirect('/')
                 else:
                     flash("Password is incorrect.", category='error')
             else:
-                flash("User does not exist.", category='error')
-                
-    return render_template('login.html')
+                flash("User does not exist.", category='error')  
+    return render_template('login.html', user=current_user)
 
 @app.route("/signup", methods=['POST', 'GET'])
 def signup():
@@ -48,8 +48,6 @@ def signup():
         
         if not email:
             flash("Email is required.", category='error')
-        elif not is_valid_email(email):
-            flash("Invalid email format.", category='error')
         elif len(name) <=2:
             flash("Name is too short.", category='error')
         elif len(password) <= 6:
@@ -59,17 +57,22 @@ def signup():
         elif User.query.filter_by(email=email).first():
             flash("User already exists.", category='error')
         else:
-            flash("User created", category='success')
-            user = User(email=email, password=password, name=name)
+            user = User(email=email, password=generate_password_hash(password, method='pbkdf2:sha256'), name=name)
             db.session.add(user)
             db.session.commit()
-    
-    return render_template("signup.html")
+            login_user(user, remember=True)
+            current_user.authenticated = True
+            flash("User created", category='success')
+            return redirect('/')
+    return render_template("signup.html", user=current_user)
 
-@app.route("/logout", methods=['POST', 'GET'])
+@login_required
+@app.route("/logout")
 def logout():
-    return redirect('/')
+    logout_user()
+    flash("Logout Successfully", category='success')
+    return redirect("/")
 
-@app.route("/about")
-def about():
-    return render_template("about.html")
+@app.route("/admin")
+def admin():
+    return render_template("admin.html", user=current_user)

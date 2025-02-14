@@ -8,8 +8,8 @@
         cursor: pointer;
         position: absolute;
         margin-left:auto;
-        margin-top: -40px;
-        right: 30px;
+        margin-top: -36px;
+        right: 40px;
         z-index: 2;
     }
     img{
@@ -32,14 +32,12 @@
             </div>
             <div class="form-group password-container">
                 <label for="password">Password</label>
-                <input id="password" name="password" class="form-control" placeholder="password" type="password" required>
-                <i><img src="../static/image/eye-close.png" id="eye-icon" alt="eye-close" /></i>
+                <input id="password" name="password" class="form-control pe-5" placeholder="password" type="password" required>
+                <i><img src="{{ url_for('static', filename='image/eye-close.png') }}" id="eye-icon" alt="eye-close" /></i>
             </div>
             <br/>
             <button type="submit" class="btn btn-outline-success">Login</button>
-            <div class="form-group">
-                <p>Don't have an account? <a href="/signup">Signup</a> here</p>
-            </div>
+            <a href="./signup" class="ms-4">Create new user?</a>
         </form>
         </div>
 </div>
@@ -50,10 +48,10 @@
     eye_icon.onclick = function() {
         if(password.type === 'password') {
             password.type = 'text';
-            eye_icon.src = '../static/image/eye-open.png';
+            eye_icon.src = "{{ url_for('static', filename='image/eye-open.png') }}";
         } else {
             password.type = 'password';
-            eye_icon.src = "../static/image/eye-close.png";
+            eye_icon.src = "{{ url_for('static', filename='image/eye-close.png') }}";
         }
     }
 </script>
