@@ -15,6 +15,8 @@
     {% block head %} {% endblock %}
   </head>
   <body>
+
+    {% block nav %} {% endblock %}
     
     {% with messages = get_flashed_messages(with_categories=true) %} {% if
       messages %} {% for category, message in messages %} {% if category ==
@@ -34,7 +36,7 @@
       </div>
       {% endif %} {% endfor %} {% endif %} {% endwith %}
 
-    {% block body %} 
+    {% block content %} 
     {% endblock %}
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

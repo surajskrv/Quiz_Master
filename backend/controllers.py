@@ -4,13 +4,9 @@ from flask_login import login_user, logout_user, login_required, current_user
 from backend.models import *
 from werkzeug.security import check_password_hash, generate_password_hash
 
-@login_required
 @app.route('/')
 def home():
-    if current_user.is_authenticated:
-        return render_template("user.html", user=current_user)
-    else:
-        return redirect("/login")
+    return render_template('home.html', user=current_user)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -24,18 +20,21 @@ def login():
             flash("Password is required.", category='error')
         else:
             user = User.query.filter_by(email=email).first()
-            if user.email == 'admin@gmail.com':
-                return redirect('/admin')
-            elif user:
-                if check_password_hash(user.password, password):
+            if not user:
+                flash("User does not exist.", category='error')  
+            elif check_password_hash(user.password, password):
+                if user.role == 0:
                     flash("Logged in", category='success')
                     login_user(user, remember=True)
                     current_user.authenticated = True
-                    return redirect('/')
-                else:
-                    flash("Password is incorrect.", category='error')
+                    return redirect('/admin')
+                elif user.role == 1:
+                    flash("Logged in", category='success')
+                    login_user(user, remember=True)
+                    current_user.authenticated = True
+                    return redirect('/user')
             else:
-                flash("User does not exist.", category='error')  
+                    flash("Password is incorrect.", category='error')
     return render_template('login.html', user=current_user)
 
 @app.route("/signup", methods=['POST', 'GET'])
@@ -57,7 +56,7 @@ def signup():
         elif User.query.filter_by(email=email).first():
             flash("User already exists.", category='error')
         else:
-            user = User(email=email, password=generate_password_hash(password, method='pbkdf2:sha256'), name=name)
+            user = User(email=email, password=generate_password_hash(password), name=name)
             db.session.add(user)
             db.session.commit()
             login_user(user, remember=True)
@@ -66,13 +65,36 @@ def signup():
             return redirect('/')
     return render_template("signup.html", user=current_user)
 
-@login_required
 @app.route("/logout")
+@login_required
 def logout():
     logout_user()
     flash("Logout Successfully", category='success')
     return redirect("/")
 
 @app.route("/admin")
+@login_required
 def admin():
     return render_template("admin.html", user=current_user)
+
+@app.route("/user")
+@login_required
+def user():
+    return render_template("user.html", user=current_user)
+
+@app.route("/subject", methods=['POST', 'GET'])
+@login_required
+def subject():
+    if request.method == 'POST':
+        name = request.form['name']
+        desc = request.form['desc']
+        subject = Subject(subject_name=name, subject_desc=desc)
+        db.session.add(subject)
+        db.session.commit()
+        flash("Subject added", category='success')
+    return render_template("admin_subject.html", user=current_user)
+
+@app.route("/chapter")
+@login_required
+def chapter():
+    return render_template("admin_chapter.html", user=current_user)

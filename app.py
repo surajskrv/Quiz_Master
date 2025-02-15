@@ -1,8 +1,20 @@
 from flask import Flask
 from backend.models import *
 from flask_login import LoginManager
+from werkzeug.security import generate_password_hash
 
 app = None
+
+def create_admin():
+    admin = User.query.filter_by(role=0).first()
+    if not admin:
+        admin = User(email="admin@gmail.com", password=generate_password_hash("hello@123"), name="admin", role=0)
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin created successfully.")
+    else:
+        print("Admin already exists.")
+        
 
 def start():
     quiz_app = Flask(__name__)
@@ -12,6 +24,8 @@ def start():
     quiz_app.app_context().push()
     quiz_app.debug = True
     db.create_all()
+    # adding admin to db
+    create_admin()
     
     login_manager = LoginManager()
     login_manager.login_view = 'login'

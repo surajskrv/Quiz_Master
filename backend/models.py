@@ -7,17 +7,17 @@ class User(db.Model, UserMixin):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
-    password = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     role = db.Column(db.Integer, nullable=False, default=1)
-    # scores = db.relationship('Score', backref='user', lazy=True)
+    scores = db.relationship('Score', backref='user', lazy=True)
 
 class Subject(db.Model):
     __tablename__ = "subject"
     id = db.Column(db.Integer, primary_key=True)
     subject_name = db.Column(db.String(100), nullable=False)
     subject_desc = db.Column(db.String(200), nullable=False)
-    # chapters = db.relationship('Chapter', backref='subject', lazy=True)
+    chapters = db.relationship('Chapter', backref='subject', lazy=True)
 
 class Chapter(db.Model):
     __tablename__ = "chapter"
@@ -25,16 +25,16 @@ class Chapter(db.Model):
     chapter_name = db.Column(db.String(100), nullable=False)
     chapter_desc = db.Column(db.String(200), nullable=False, default="No Description")
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    # quizzes = db.relationship('Quiz', backref='chapter', lazy=True)
+    quizzes = db.relationship('Quiz', backref='chapter', lazy=True)
     
 class Quiz(db.Model):
     __tablename__ = "quiz"
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.String, nullable=False)
+    date = db.Column(db.Date, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
-    # questions = db.relationship('Question', backref='quiz', lazy=True)
-    # scores = db.relationship('Score', backref='quiz', lazy=True)
+    questions = db.relationship('Question', backref='quiz', lazy=True)
+    scores = db.relationship('Score', backref='quiz', lazy=True)
     
 class Question(db.Model):
     __tablename__ = "question"
@@ -46,9 +46,7 @@ class Question(db.Model):
     option_c = db.Column(db.String(250), nullable=False)
     option_d = db.Column(db.String(250), nullable=False)
     correct_option = db.Column(db.String(1), nullable=False)  # a, b, c, or d
-    # quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
-    
-    # chapter = db.relationship('Chapter', backref=db.backref('questions', lazy=True))
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
     
 class Score(db.Model):
     __tablename__ = "score"
@@ -57,6 +55,3 @@ class Score(db.Model):
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
     score = db.Column(db.Integer, nullable=False)
     date = db.Column(db.String, nullable=False)
-    
-    # user = db.relationship('User', backref=db.backref('scores', lazy=True))
-    # quiz = db.relationship('Quiz', backref=db.backref('scores', lazy=True))
