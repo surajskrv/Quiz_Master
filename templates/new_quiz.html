@@ -1,0 +1,22 @@
+{% extends "base.html"%}
+
+{% block content %}
+   
+<div class="container col-md-4 col-md-offset-4">
+    <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
+        <h3 align="center">New Quiz</h3>
+        <form method="post">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name">
+                <label for="date" class = "form-label">Date : </label>
+                <input type="date" class="form-control" id="date" name="date">
+                <label for="time" class = "form-label">Duration : </label>
+                <input type="time" class="form-control" id="time" name="time">
+            </div>
+            <a href="/admin_quiz" class="btn btn-outline-success me-3">Save</a>
+            <a href="/admin_quiz" class="btn btn-outline-danger">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

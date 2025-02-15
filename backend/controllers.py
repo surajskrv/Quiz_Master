@@ -8,6 +8,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 def home():
     return render_template('home.html', user=current_user)
 
+# ------------------ Authentication --------------------------------------
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
@@ -72,19 +74,27 @@ def logout():
     flash("Logout Successfully", category='success')
     return redirect("/")
 
+
+# --------------------- Admin Routes -------------------------------------
+
 @app.route("/admin")
 @login_required
 def admin():
     return render_template("admin.html", user=current_user)
 
-@app.route("/user")
+@app.route("/admin_quiz")
 @login_required
-def user():
-    return render_template("user.html", user=current_user)
+def admin_quiz():
+    return render_template('admin_quiz.html', user=current_user)
 
-@app.route("/subject", methods=['POST', 'GET'])
+@app.route("/admin_summary")
 @login_required
-def subject():
+def admin_summary():
+    return render_template('admin_summary.html', user=current_user)
+
+@app.route("/new_subject", methods=['POST', 'GET'])
+@login_required
+def new_subject():
     if request.method == 'POST':
         name = request.form['name']
         desc = request.form['desc']
@@ -92,9 +102,47 @@ def subject():
         db.session.add(subject)
         db.session.commit()
         flash("Subject added", category='success')
-    return render_template("admin_subject.html", user=current_user)
+    return render_template("new_subject.html", user=current_user)
 
-@app.route("/chapter")
+@app.route("/new_chapter", methods=['POST', 'GET'])
 @login_required
-def chapter():
-    return render_template("admin_chapter.html", user=current_user)
+def new_chapter():
+    return render_template("new_chapter.html", user=current_user)
+
+@app.route("/new_quiz", methods=['POST', 'GET'])
+@login_required
+def new_quiz():
+    return render_template("new_quiz.html", user=current_user)
+
+@app.route("/new_question", methods=['POST', 'GET'])
+@login_required
+def new_question():
+    return render_template("new_question.html", user=current_user)
+
+
+# -------------------- User Routes --------------------------------
+
+@app.route("/user")
+@login_required
+def user():
+    return render_template("user.html", user=current_user)
+
+@app.route('/user_scores')
+@login_required
+def user_scores():
+    return render_template('user_scores.html', user=current_user)
+
+@app.route("/user_summary")
+@login_required
+def user_summary():
+    return render_template('user_summary.html', user=current_user)
+
+@app.route("/quiz_view")
+@login_required
+def quiz_view():
+    return render_template('quiz_view.html', user=current_user)
+
+@app.route("/quiz_start")
+@login_required
+def quiz_start():
+    return render_template('quiz_start.html', user=current_user)

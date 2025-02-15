@@ -1,17 +1,21 @@
-{% extends "base.html" %} 
-
-{% block head %}
-  <style>
-    nav {
-      background-color: #e3f2fd;
-    }
-  </style>
-{% endblock %}
-
-{% block nav %}
+{% extends "base.html" %} {% block head %}
+<style>
+  nav {
+    background-color: #e3f2fd;
+  }
+</style>
+{% endblock %} {% block nav %}
 
 <nav class="navbar navbar-expand-lg navbar-light">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
     <span class="navbar-toggler-icon"></span>
   </button>
 
@@ -32,15 +36,45 @@
     </ul>
   </div>
   <form class="d-flex">
-    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+    <input
+      class="form-control me-2"
+      type="search"
+      placeholder="Search"
+      aria-label="Search"
+    />
     <button class="btn btn-outline-success me-3" type="submit">Search</button>
   </form>
 </nav>
-  
-{% endblock %}
 
-{% block content %}
- <h1>Welcome to Quiz Master</h1>
-    <p class="lead">Test your knowledge with our quizzes. Select a quiz from the list below to get started.</p>
+{% endblock %} {% block content %}
+<div class="container mt-5">
+  <div class="bg-white p-4 rounded">
+    <h2>Upcoming Quizzes</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>No. of Questions</th>
+          <th>Date</th>
+          <th>Duration (hh:mm)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>15</td>
+          <td>16/02/2025</td>
+          <td>00:15</td>
+          <td>
+            <a href="/quiz_view" class="btn btn-outline-primary btn-sm">View</a>
+            <a href="/quiz_start" class="btn btn-outline-success btn-sm">Start</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
 
 {% endblock %}

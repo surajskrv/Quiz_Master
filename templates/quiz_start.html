@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<style>
+        .quiz-container {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 50px auto;
+            max-width: 600px;
+        }
+        .timer {
+            border: 2px solid #007bff;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .question-statement {
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block content%}
+    <div class="container">
+        <div class="quiz-container">
+            <h2 class="text-center">Start the Quiz</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    QNo. <span class="badge badge-success">3/15</span>
+                </div>
+                <div class="timer">
+                    00:13:52
+                </div>
+            </div>
+            <div class="question-statement">
+                .....Question Statement...
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="options" id="option1">
+                <label class="form-check-label" for="option1">
+                    1) Option....
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="options" id="option2">
+                <label class="form-check-label" for="option2">
+                    2) Option....
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="options" id="option3" checked>
+                <label class="form-check-label" for="option3">
+                    3) Option....
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="options" id="option4">
+                <label class="form-check-label" for="option4">
+                    4) Option....
+                </label>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-primary">Save and Next</button>
+                <button class="btn btn-success">Submit</button>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

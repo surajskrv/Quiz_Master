@@ -1,9 +1,17 @@
 {% extends "base.html" %} {% block head %}
+
 <style>
   nav {
     background-color: #e3f2fd;
   }
+  .fixed-bottom-button {
+    position: fixed;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+}
 </style>
+
 {% endblock %} {% block nav %}
 
 <nav class="navbar navbar-expand-lg navbar-light">
@@ -73,17 +81,12 @@
     {% endfor %}
   </div>
 </div>
+<a href="/new_subject" class="btn btn-outline-warning fixed-bottom-button">+</a>
+
 {% endif %} {% if not subjects %}
 <div class="container">
-  <div class="row">
-    <div class="col-sm-4">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">No subjects found</h5>
-          <a href="/subject" class="btn btn-outline-primary">+ Subject</a>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="text-md-center">No Subject Found</div>
 </div>
+<a href="/new_subject" class="btn btn-outline-warning fixed-bottom-button">+ Subject</a>
+
 {% endif %} {% endblock %}
