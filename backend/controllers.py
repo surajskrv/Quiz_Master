@@ -1,8 +1,20 @@
 from flask import current_app as app
-from flask import render_template, redirect, request, flash
+from flask import render_template, redirect, request, flash, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from backend.models import *
 from werkzeug.security import check_password_hash, generate_password_hash
+
+# ----- Protecting user to access admin dashboard and more ---------
+def admin_required(func):
+    @login_required
+    def decorated_view(*args, **kwargs):
+        if current_user.role != 0:
+            flash('You do not have permission to access this page.', 'danger')
+            return redirect('/user') 
+        return func(*args, **kwargs)
+    return decorated_view
+
+#--------------------- end ---------------------------------------
 
 @app.route('/')
 def home():
@@ -64,7 +76,7 @@ def signup():
             login_user(user, remember=True)
             current_user.authenticated = True
             flash("User created", category='success')
-            return redirect('/')
+            return redirect('/user')
     return render_template("signup.html", user=current_user)
 
 @app.route("/logout")
@@ -79,43 +91,62 @@ def logout():
 
 @app.route("/admin")
 @login_required
+# @admin_required
 def admin():
-    return render_template("admin.html", user=current_user)
+    subjects = Subject.query.order_by(Subject.id).all()
+    chapters = Chapter.query.order_by(Chapter.id).all()
+    return render_template("admin.html", user=current_user, subjects=subjects, chapters = chapters)
 
 @app.route("/admin_quiz")
 @login_required
+# @admin_required
 def admin_quiz():
     return render_template('admin_quiz.html', user=current_user)
 
 @app.route("/admin_summary")
 @login_required
+# @admin_required
 def admin_summary():
     return render_template('admin_summary.html', user=current_user)
 
 @app.route("/new_subject", methods=['POST', 'GET'])
 @login_required
+# @admin_required
 def new_subject():
     if request.method == 'POST':
         name = request.form['name']
         desc = request.form['desc']
-        subject = Subject(subject_name=name, subject_desc=desc)
+        subject = Subject(name=name, desc=desc)
         db.session.add(subject)
         db.session.commit()
         flash("Subject added", category='success')
+        return redirect(url_for('admin'))
     return render_template("new_subject.html", user=current_user)
 
-@app.route("/new_chapter", methods=['POST', 'GET'])
+@app.route("/new_chapter/<int:subject_id>/", methods=['POST', 'GET'])
 @login_required
-def new_chapter():
+# @admin_required
+def new_chapter(subject_id):
+    subject = Subject.query.filter_by(id =subject_id).first()
+    if request.method == 'POST':
+        name = request.form['name']
+        desc = request.form['desc']
+        chapter = Chapter(name=name, desc=desc, subject_id=subject.id)
+        db.session.add(chapter)
+        db.session.commit()
+        flash("Chapter added", category='success')
+        return redirect(url_for('admin'))
     return render_template("new_chapter.html", user=current_user)
 
 @app.route("/new_quiz", methods=['POST', 'GET'])
 @login_required
+# @admin_required
 def new_quiz():
     return render_template("new_quiz.html", user=current_user)
 
 @app.route("/new_question", methods=['POST', 'GET'])
 @login_required
+# @admin_required
 def new_question():
     return render_template("new_question.html", user=current_user)
 

@@ -7,12 +7,15 @@
   .fixed-bottom-button {
     position: fixed;
     bottom: 35px;
+    width:150px;
     left: 50%;
     transform: translateX(-50%);
 }
 </style>
 
-{% endblock %} {% block nav %}
+{% endblock %} 
+
+{% block nav %}
 
 <nav class="navbar navbar-expand-lg navbar-light">
   <button
@@ -54,39 +57,58 @@
   </form>
 </nav>
 
-{% endblock %} {% block content %} {% if subjects %} {% for subject in subjects
-%}
-<div class="container">
+{% endblock %} 
+
+{% block content %} 
+<div class="container mb-5">
   <div class="row">
-    <div class="col-sm-4">
-      <div class="card">
+    {% if subjects %} 
+    {% for subject in subjects %}
+    <div class="col-sm-6">
+      <div class="card mt-3">
         <div class="card-body">
-          <h5 class="card-title">{{ subject.subject_name }}</h5>
-          {% if chapters %} {% for chapter in chapters %}
-          <p class="card-text">Chapters: {{ chapters[subject.id] }}</p>
-          <p class="card-text">{{ subject.description }}</p>
-          <a href="/admin_quiz/{{ subject.id }}" class="btn btn-outline-warning"
-            >Edit</a
-          >
-          <a href="/admin_quiz/{{ subject.id }}" class="btn btn-outline-danger"
-            >Delete</a
-          >
-          {% endfor %} {% else %}
+          <h5 class="card-title">{{ subject.name }}</h5>
+          {% if chapters %} 
+          <table class="table table-light table-striped-columns">
+            <thead>
+              <tr>
+                <th>Chapter Name</th>
+                <th>No. of Questions</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for chapter in chapters %}
+              <tr>
+                <td>{{chapter.name}}</td>
+                <td>15</td>
+                <td>
+                  <a href="/new_chapter/{{ subject.id }}" class="btn btn-outline-warning">Edit</a>
+                  <a href="/new_chapter/{{ subject.id }}" class="btn btn-outline-danger">Delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
           <p class="card-text">No chapters found</p>
-          <a href="/chapter" class="btn btn-outline-primary">+ Chapter</a>
           {% endif %}
+          <a href="/new_chapter/{{ subject.id }}/" class="btn btn-outline-primary float-end">+ Chapter</a>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
 </div>
-<a href="/new_subject" class="btn btn-outline-warning fixed-bottom-button">+</a>
 
-{% endif %} {% if not subjects %}
+{% endif %} 
+{% if not subjects %}
 <div class="container">
-  <div class="text-md-center">No Subject Found</div>
+  <div class="text-center mt-4 fw-bold">No Subject Found</div>
 </div>
-<a href="/new_subject" class="btn btn-outline-warning fixed-bottom-button">+ Subject</a>
 
-{% endif %} {% endblock %}
+{% endif %}
+
+<a href="/new_subject" class="btn btn-warning fixed-bottom-button">+ Subject</a>
+
+{% endblock %}

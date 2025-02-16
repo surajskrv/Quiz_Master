@@ -15,15 +15,15 @@ class User(db.Model, UserMixin):
 class Subject(db.Model):
     __tablename__ = "subject"
     id = db.Column(db.Integer, primary_key=True)
-    subject_name = db.Column(db.String(100), nullable=False)
-    subject_desc = db.Column(db.String(200), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    desc = db.Column(db.String(200), nullable=False)
     chapters = db.relationship('Chapter', backref='subject', lazy=True)
 
 class Chapter(db.Model):
     __tablename__ = "chapter"
     id = db.Column(db.Integer, primary_key=True)
-    chapter_name = db.Column(db.String(100), nullable=False)
-    chapter_desc = db.Column(db.String(200), nullable=False, default="No Description")
+    name = db.Column(db.String(100), nullable=False)
+    desc = db.Column(db.String(200), nullable=False, default="No Description")
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
     quizzes = db.relationship('Quiz', backref='chapter', lazy=True)
     
@@ -39,8 +39,8 @@ class Quiz(db.Model):
 class Question(db.Model):
     __tablename__ = "question"
     id = db.Column(db.Integer, primary_key=True)
-    question_title = db.Column(db.String(100), nullable=False)
-    question_text = db.Column(db.String(250), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    question = db.Column(db.String(250), nullable=False)
     option_a = db.Column(db.String(250), nullable=False)
     option_b = db.Column(db.String(250), nullable=False)
     option_c = db.Column(db.String(250), nullable=False)

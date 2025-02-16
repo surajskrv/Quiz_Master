@@ -9,6 +9,7 @@
   .fixed-bottom-button {
     position: fixed;
     bottom: 35px;
+    width:150px;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -60,22 +61,56 @@
 
 {% endblock %}
 
-{% block content %}
-   
-<div class="container col-md-4 col-md-offset-4">
-    <h3>Admin Quiz</h3>
-    <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
-        <h3 align="center">Add Chapter</h3>
-        <form method="post">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name">
-                <label for="desc" class = "form-label">Description</label>
-                <input type="text" class="form-control" id="desc" name="desc">
-            </div>
-            <a href="/new_question" class="btn btn-outline-success">+ Question</a>
-          </form>
+{% block content %} 
+<div class="container mb-5">
+  <div class="row">
+    {% if subjects %} 
+    {% for subject in subjects %}
+    <div class="col-sm-6">
+      <div class="card mt-3">
+        <div class="card-body">
+          <h5 class="card-title">{{ subject.name }}</h5>
+          {% if chapters %} 
+          <table class="table table-light table-striped-columns">
+            <thead>
+              <tr>
+                <th>Chapter Name</th>
+                <th>No. of Questions</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for chapter in chapters %}
+              <tr>
+                <td>{{chapter.name}}</td>
+                <td>15</td>
+                <td>
+                  <a href="/new_chapter/{{ subject.id }}" class="btn btn-outline-warning">Edit</a>
+                  <a href="/new_chapter/{{ subject.id }}" class="btn btn-outline-danger">Delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="card-text">No chapters found</p>
+          {% endif %}
+          <a href="/new_chapter/{{ subject.id }}/" class="btn btn-outline-primary float-end">+ Chapter</a>
+        </div>
+      </div>
     </div>
+    {% endfor %}
+  </div>
 </div>
-<a href="/new_quiz" class="btn btn-outline-success fixed-bottom-button">+ New Quiz</a>
+
+{% endif %} 
+{% if not subjects %}
+<div class="container">
+  <div class="text-center mt-4 fw-bold">No Subject Found</div>
+</div>
+
+{% endif %}
+
+<a href="/new_quiz" class="btn btn-success fixed-bottom-button">+ New Quiz</a>
+
 {% endblock %}
