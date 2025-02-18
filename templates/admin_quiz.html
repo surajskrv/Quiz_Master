@@ -89,8 +89,8 @@
                 <td>{{question.id}}</td>
                 <td>{{question.title}}</td>
                 <td>
-                  <button type="submit" title="save" class="btn btn-outline-warning">Edit</button>
-                  <a href="/new_quiz/{{ chapter.id }}" class="btn btn-outline-danger">Delete</a>
+                  <a href="/question/{{ question.id }}/edit" class="btn btn-outline-warning">Edit</a>
+                  <a href="/question/{{ question.id }}/delete" class="btn btn-outline-danger">Delete</a>
                 </td>
               </tr>
               {% endfor %}
@@ -99,7 +99,7 @@
           {% else %}
           <p class="card-text">No Questions found</p>
           {% endif %}
-          <a href="/new_question" class="btn btn-outline-primary float-end">+ Question</a>
+          <a href="/new_question/{{ quiz.id }}/" class="btn btn-outline-primary float-end">+ Question</a>
         </div>
       </div>
     </div>
@@ -108,14 +108,14 @@
   
   {% endif %} 
   
-<!----------------------- If subjects are not present------------------------>
+<!----------------------- If quizzes are not present------------------------>
   {% if not quizzes %}
     <div class="text-center mt-4 fw-bold">No Quizzes Found, Add Quiz</div>
   {% endif %}
 
 </div>
 
-<!---------------------- Subject adding button  ------------------------->
+<!---------------------- Quiz adding button  ------------------------->
 
 <a href="/new_quiz" class="btn btn-success fixed-bottom-button">+ Quiz</a>
 

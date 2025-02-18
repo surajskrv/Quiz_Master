@@ -1,0 +1,20 @@
+{% extends "base.html"%}
+
+{% block content %}
+   
+<div class="container col-md-4 col-md-offset-4">
+    <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
+        <h3 align="center">Edit Chapter</h3>
+        <form method="post">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{chapter.name}}">
+                <label for="desc" class = "form-label">Description</label>
+                <input type="text" class="form-control" id="desc" name="desc" value="{{chapter.desc}}">
+            </div>
+            <button type="submit" class="btn btn-outline-success">Save</button>
+            <a href="/admin" class="btn btn-outline-danger">Cancel</a>
+          </form>
+    </div>
+</div>
+{% endblock %}

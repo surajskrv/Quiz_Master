@@ -48,9 +48,10 @@
 
 {% endblock %} {% block content %}
 <div class="container mt-5">
-  <div class="bg-white p-4 rounded">
-    <h2>Upcoming Quizzes</h2>
+  <div class="card shadow-lg bg-white p-4 rounded">
+    <h3 class="text-center">Upcoming Quizzes</h3>
     <table class="table table-striped">
+      {% if quizzes %} 
       <thead>
         <tr>
           <th>ID</th>
@@ -61,20 +62,24 @@
         </tr>
       </thead>
       <tbody>
+        {% for quiz in quizzes %}
         <tr>
-          <td>1</td>
-          <td>15</td>
-          <td>16/02/2025</td>
-          <td>00:15</td>
+          <td>{{ quiz.id }}</td>
+          <td>{{ quiz.questions|length }}</td>
+          <td>{{ quiz.date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ quiz.duration }}</td>
           <td>
             <a href="/quiz_view" class="btn btn-outline-primary btn-sm">View</a>
             <a href="/quiz_start" class="btn btn-outline-success btn-sm">Start</a>
           </td>
         </tr>
+        {% endfor %}
       </tbody>
     </table>
+    {% else %}
+    <h3 class="text-center mt-5">No Questions found</h3>
+    {% endif %}
   </div>
-
 </div>
 
 {% endblock %}

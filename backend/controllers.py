@@ -4,6 +4,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from backend.models import *
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from sqlalchemy import func
 
 # ----- Protecting user to access admin dashboard and more ---------
 def admin_required(func):
@@ -154,27 +155,101 @@ def new_quiz():
         return redirect(url_for('admin_quiz'))
     return render_template("new_quiz.html", user=current_user, chapters=chapters)
 
-@app.route("/new_question", methods=['POST', 'GET'] )
-# @admin_required
-def new_question():
-    # quiz = Quiz.query.filter_by(id =quiz_id).first()
-    # if request.method == 'POST':
-    #     title = request.form['title']
-    #     qns_stmt = request.form['question']
-    #     question = Question()
-    #     db.session.add(question)
-    #     db.session.commit()
-    #     flash("Question added", category='success')
-    #     return redirect(url_for('admin_quiz'))
-    return render_template("new_question.html", user=current_user)
+@app.route('/new_question/<int:quiz_id>/', methods=['GET', 'POST'])
+def new_question(quiz_id):
+    if request.method == 'POST':
+        title = request.form['title']
+        question_stmt = request.form['stmt']
+        option_a = request.form['a']
+        option_b = request.form['b']
+        option_c = request.form['c']
+        option_d = request.form['d']
+        correct_option = request.form['correct_option']
+        new_question = Question(
+            title=title,
+            question_stmt=question_stmt,
+            option_a=option_a,
+            option_b=option_b,
+            option_c=option_c,
+            option_d=option_d,
+            correct_option=correct_option,
+            quiz_id=quiz_id
+        )
+        db.session.add(new_question)
+        db.session.commit()
+        return redirect(url_for('admin_quiz'))
+    return render_template('new_question.html',user=current_user, quiz_id=quiz_id)
 
+#------- Editing the chapter From Admin and respective pages---------
+
+@app.route('/chapter/<cid>/edit', methods=['GET', 'POST'])
+def edit_chapter(cid):
+    chapter = Chapter.query.get_or_404(cid)
+    if request.method == 'POST':
+        chapter.name = request.form['name']
+        chapter.desc = request.form['desc']
+        db.session.commit()
+        flash('Chapter updated successfully!', 'success')
+        return redirect(url_for('admin'))
+    return render_template('edit_chapter.html', chapter=chapter)
+
+#------- Deleting the chapter From Admin and respective pages---------
+
+@app.route('/chapter/<cid>/delete', methods=["GET", "POST"])
+def delete_chapter(cid):
+    if request.method == "GET":
+        try:
+            chapter = Chapter.query.get_or_404(cid)
+            for quiz in Quiz.query.filter_by(chapter_id=cid).all(): 
+                Question.query.filter_by(quiz_id=quiz.id).delete()
+                db.session.delete(quiz) 
+            db.session.delete(chapter) 
+            db.session.commit()
+            return redirect(url_for('admin'))
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error deleting chapter: {e}") 
+            
+# -------- Editing the questions from quiz ---------------------
+
+@app.route('/question/<qid>/edit', methods=['GET', 'POST'])
+def edit_question(qid):
+    question = Question.query.get_or_404(qid)
+    if request.method == 'POST':
+        question.title = request.form['title']
+        question.question_stmt = request.form['stmt']
+        question.option_a = request.form['a']
+        question.option_b = request.form['b']
+        question.option_c = request.form['c']
+        question.option_d = request.form['d']
+        question.correct_option = request.form['correct_option']
+        db.session.commit()
+        flash('Question updated successfully!', 'success')
+        return redirect(url_for('admin_quiz', quiz_id=question.quiz_id))
+    return render_template('edit_question.html', question=question)
+
+# -------- Deleting the questions from quiz ---------------------
+
+@app.route('/question/<qid>/delete', methods=['GET', 'POST'])
+def delete_question(qid):
+    if request.method == 'GET':
+        try:
+            question = Question.query.get_or_404(qid)
+            db.session.delete(question)
+            db.session.commit()
+            return redirect(url_for('admin_quiz'))
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error deleting question: {e}")
 
 # -------------------- User Routes --------------------------------
 
 @app.route("/user")
 @login_required
 def user():
-    return render_template("user.html", user=current_user)
+    today = datetime.now().date()
+    quizzes = Quiz.query.order_by(Quiz.date).all()
+    return render_template("user.html", user=current_user, quizzes = quizzes)
 
 @app.route('/user_scores')
 @login_required
