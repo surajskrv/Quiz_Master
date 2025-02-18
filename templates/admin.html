@@ -19,7 +19,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light">
   <button
-    class="navbar-toggler"
+    class="navbar-toggler ms-2"
     type="button"
     data-toggle="collapse"
     data-target="#navbarSupportedContent"
@@ -46,7 +46,7 @@
       </li>
     </ul>
   </div>
-  <form class="d-flex">
+  <form class="d-flex ms-2">
     <input
       class="form-control me-2"
       type="search"
@@ -64,11 +64,11 @@
   <div class="row">
     {% if subjects %} 
     {% for subject in subjects %}
-    <div class="col-sm-6">
+    <div class="col-lg-6">
       <div class="card mt-3">
         <div class="card-body">
           <h5 class="card-title">{{ subject.name }}</h5>
-          {% if chapters %} 
+          {% if subject.chapters %} 
           <table class="table table-light table-striped-columns">
             <thead>
               <tr>
@@ -78,7 +78,7 @@
               </tr>
             </thead>
             <tbody>
-            {% for chapter in chapters %}
+            {% for chapter in subject.chapters %}
               <tr>
                 <td>{{chapter.name}}</td>
                 <td>15</td>
@@ -99,15 +99,17 @@
     </div>
     {% endfor %}
   </div>
+  
+  {% endif %} 
+  
+<!----------------------- If subjects are not present------------------------>
+  {% if not subjects %}
+    <div class="text-center mt-4 fw-bold">No Subject Found</div>
+  {% endif %}
+
 </div>
 
-{% endif %} 
-{% if not subjects %}
-<div class="container">
-  <div class="text-center mt-4 fw-bold">No Subject Found</div>
-</div>
-
-{% endif %}
+<!---------------------- Subject adding button  ------------------------->
 
 <a href="/new_subject" class="btn btn-warning fixed-bottom-button">+ Subject</a>
 

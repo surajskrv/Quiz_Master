@@ -1,20 +1,58 @@
 {% extends "base.html"%}
 
 {% block content %}
-   
-<div class="container col-md-4 col-md-offset-4">
+<div class="container col-md-7 col-md-offset-4">
     <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
-        <h3 align="center">Add Subject</h3>
-        <form method="post">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name">
-                <label for="desc" class = "form-label">Description</label>
-                <input type="text" class="form-control" id="desc" name="desc">
-            </div>
-            <a href="/admin_quiz" class="btn btn-outline-success">Save and Next</a>
-            <a href="/admin_quiz" class="btn btn-outline-danger">Close</a>
-        </form>
+            <h3 class="text-center mb-4">New Question</h3>
+            <form method="post">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Question Title: </label>
+                    <input type="text" class="form-control" id="title" name="title" required />
+                    <label for="stmt" class = "form-label">Question Statement: </label>
+                    <textarea class="form-control" id="stmt" name="stmt" rows="3" required></textarea>
+                </div>
+                <div class="card border-basic bg-white p-5 mb-3 mt-3">
+                    <h5 class="text-center">Single Option Correct</h5>
+                    <div class="form-group row align-items-center mt-2">
+                        <label for="a" class="form-label col-lg-3">Option a) </label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="a" name="a" required />
+                        </div>
+                    </div>
+                    <div class="form-group row align-items-center mt-2">
+                        <label for="b" class="form-label col-lg-3">Option b) </label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="b" name="b" required />
+                        </div>
+                    </div>
+                    <div class="form-group row align-items-center mt-2">
+                        <label for="c" class="form-label col-lg-3">Option c) </label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="c" name="c" required />
+                        </div>
+                    </div>
+                    <div class="form-group row align-items-center mt-2">
+                        <label for="d" class="form-label col-lg-3">Option d) </label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="d" name="d" required />
+                        </div>
+                    </div>
+                    <div class="form-group row align-items-center mt-2">
+                        <label for="option" class="form-label col-lg-3 ms-2">Correct Option:</label>
+                        <select class="form-select w-auto h-auto me-2" name="correct_option" aria-label="Default select example" required>
+                            <option selected>Correct Option</option>
+                            <option value="a">a</option>
+                            <option value="b">b</option>
+                            <option value="c">c</option>
+                            <option value="d">d</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" class="btn btn-outline-primary me-4">Save and Next</button>
+                    <a href="{{url_for('admin_quiz')}}" class="btn btn-outline-danger">Close</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock %}

@@ -28,7 +28,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light">
   <button
-    class="navbar-toggler"
+    class="navbar-toggler ms-2"
     type="button"
     data-toggle="collapse"
     data-target="#navbarSupportedContent"
@@ -55,7 +55,7 @@
       </li>
     </ul>
   </div>
-  <form class="d-flex">
+  <form class="d-flex ms-2">
     <input
       class="form-control me-2"
       type="search"
@@ -69,33 +69,6 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="chart-container">
-            <h2 class="text-center mb-4">Summary Charts</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="chart">
-                        <h3>Subject wise no. of quizzes</h3>
-                        <div style="height: 200px; border-bottom: 2px solid #000;">
-                            <div style="display: inline-block; width: 50px; height: 100px; background-color: lightblue; margin: 0 10px; vertical-align: bottom;"></div>
-                            <div style="display: inline-block; width: 50px; height: 180px; background-color: lightgreen; margin: 0 10px; vertical-align: bottom;"></div>
-                            <div style="display: inline-block; width: 50px; height: 120px; background-color: lightpink; margin: 0 10px; vertical-align: bottom;"></div>
-                        </div>
-                        <div style="margin-top: 10px;">Maths Physics Chemistry</div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="chart">
-                        <h3>Month wise no.of quizzes attempted</h3>
-                        <div style="position: relative; width: 200px; height: 200px; margin: 0 auto; border-radius: 50%; background: linear-gradient(to right, lightpink 25%, transparent 25%), linear-gradient(to bottom, lightblue 50%, transparent 50%), linear-gradient(to left, lightgreen 75%, transparent 75%);">
-                            <div style="position: absolute; top: 10%; left: 45%;">03</div>
-                            <div style="position: absolute; top: 45%; left: 10%;">02</div>
-                            <div style="position: absolute; top: 80%; left: 45%;">01</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<h3>This is admin Summary page</h3>
 
 {% endblock %}

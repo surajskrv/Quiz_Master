@@ -7,8 +7,13 @@
         <h3 align="center">New Quiz</h3>
         <form method="post">
             <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name">
+                <label for="chapter" class="form-label">Chapter Name: </label>
+                <select class="form-select" name="selected_chapter" aria-label="Default select example">
+                    <option selected>Choose any</option>
+                    {% for chapter in chapters %}
+                        <option value="{{ chapter.id }}">{{ chapter.name }}</option>
+                    {% endfor %}
+                </select>
                 <label for="date" class = "form-label">Date : </label>
                 <input type="date" class="form-control" id="date" name="date">
                 <label for="time" class = "form-label">Duration : </label>

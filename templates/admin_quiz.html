@@ -21,7 +21,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light">
   <button
-    class="navbar-toggler"
+    class="navbar-toggler ms-2"
     type="button"
     data-toggle="collapse"
     data-target="#navbarSupportedContent"
@@ -48,7 +48,7 @@
       </li>
     </ul>
   </div>
-  <form class="d-flex">
+  <form class="d-flex ms-2">
     <input
       class="form-control me-2"
       type="search"
@@ -64,53 +64,59 @@
 {% block content %} 
 <div class="container mb-5">
   <div class="row">
-    {% if subjects %} 
-    {% for subject in subjects %}
-    <div class="col-sm-6">
+    {% if quizzes %} 
+    {% for quiz in quizzes %}
+    <div class="col-lg-6">
       <div class="card mt-3">
         <div class="card-body">
-          <h5 class="card-title">{{ subject.name }}</h5>
-          {% if chapters %} 
+          <h5 class="card-title text-center">{{ quiz.chapter.name }}</h5>
+          <div class="d-flex justify-content-between">
+            <div>Duration: {{quiz.duration}}</div>
+            <div>Date: {{quiz.date}}</div>
+          </div>
+          {% if questions %} 
           <table class="table table-light table-striped-columns">
             <thead>
               <tr>
-                <th>Chapter Name</th>
-                <th>No. of Questions</th>
+                <th>ID</th>
+                <th>Question Title</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-            {% for chapter in chapters %}
+            {% for question in quiz.questions %}
               <tr>
-                <td>{{chapter.name}}</td>
-                <td>15</td>
+                <td>{{question.id}}</td>
+                <td>{{question.title}}</td>
                 <td>
-                  <a href="/new_chapter/{{ subject.id }}" class="btn btn-outline-warning">Edit</a>
-                  <a href="/new_chapter/{{ subject.id }}" class="btn btn-outline-danger">Delete</a>
+                  <button type="submit" title="save" class="btn btn-outline-warning">Edit</button>
+                  <a href="/new_quiz/{{ chapter.id }}" class="btn btn-outline-danger">Delete</a>
                 </td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
           {% else %}
-          <p class="card-text">No chapters found</p>
+          <p class="card-text">No Questions found</p>
           {% endif %}
-          <a href="/new_chapter/{{ subject.id }}/" class="btn btn-outline-primary float-end">+ Chapter</a>
+          <a href="/new_question" class="btn btn-outline-primary float-end">+ Question</a>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
+  
+  {% endif %} 
+  
+<!----------------------- If subjects are not present------------------------>
+  {% if not quizzes %}
+    <div class="text-center mt-4 fw-bold">No Quizzes Found, Add Quiz</div>
+  {% endif %}
+
 </div>
 
-{% endif %} 
-{% if not subjects %}
-<div class="container">
-  <div class="text-center mt-4 fw-bold">No Subject Found</div>
-</div>
+<!---------------------- Subject adding button  ------------------------->
 
-{% endif %}
-
-<a href="/new_quiz" class="btn btn-success fixed-bottom-button">+ New Quiz</a>
+<a href="/new_quiz" class="btn btn-success fixed-bottom-button">+ Quiz</a>
 
 {% endblock %}

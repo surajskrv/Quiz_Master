@@ -40,7 +40,7 @@ class Question(db.Model):
     __tablename__ = "question"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    question = db.Column(db.String(250), nullable=False)
+    question_stmt = db.Column(db.String(250), nullable=False)
     option_a = db.Column(db.String(250), nullable=False)
     option_b = db.Column(db.String(250), nullable=False)
     option_c = db.Column(db.String(250), nullable=False)
