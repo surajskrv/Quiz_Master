@@ -7,14 +7,6 @@ from datetime import datetime
 from sqlalchemy import func
 
 # ----- Protecting user to access admin dashboard and more ---------
-def admin_required(func):
-    @login_required
-    def decorated_view(*args, **kwargs):
-        if current_user.role != 0:
-            flash('You do not have permission to access this page.', 'danger')
-            return redirect('/user') 
-        return func(*args, **kwargs)
-    return decorated_view
 
 #--------------------- end ---------------------------------------
 
@@ -261,12 +253,29 @@ def user_scores():
 def user_summary():
     return render_template('user_summary.html', user=current_user)
 
-@app.route("/quiz_view")
+@app.route("/quiz_view/<int:qid>/")
 @login_required
-def quiz_view():
-    return render_template('quiz_view.html', user=current_user)
+def quiz_view(qid):
+    quiz = Quiz.query.get_or_404(qid)
+    chapter = quiz.chapter
+    subject = chapter.subject
+    return render_template('quiz_view.html', user=current_user, quiz=quiz, chapter=chapter, subject=subject)
 
-@app.route("/quiz_start")
+@app.route("/quiz_start/<int:qid>/")
 @login_required
-def quiz_start():
-    return render_template('quiz_start.html', user=current_user)
+def quiz_start(qid):
+    quiz = Quiz.query.get_or_404(qid)
+    questions = quiz.questions
+    return render_template('quiz_start.html', user=current_user, quiz=quiz, questions=questions)
+
+@app.route("/submit_quiz/<int:qid>", methods=['POST'])
+@login_required
+def submit_quiz(qid):
+    quiz = Quiz.query.get_or_404(qid)
+    questions = quiz.questions
+    score = 0
+    for question in questions:
+        user_answer = request.form.get(f'question-{question.id}')
+        if user_answer == question.correct_option:
+            score += 1
+    return redirect(url_for('quiz_result', qid=quiz.id, score=score))

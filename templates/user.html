@@ -69,8 +69,8 @@
           <td>{{ quiz.date.strftime('%Y-%m-%d') }}</td>
           <td>{{ quiz.duration }}</td>
           <td>
-            <a href="/quiz_view" class="btn btn-outline-primary btn-sm">View</a>
-            <a href="/quiz_start" class="btn btn-outline-success btn-sm">Start</a>
+            <a href="/quiz_view/{{ quiz.id }}/" class="btn btn-outline-primary">View</a>
+            <a href="/quiz_start/{{ quiz.id }}/" class="btn btn-outline-warning">Start</a>
           </td>
         </tr>
         {% endfor %}

@@ -1,77 +1,153 @@
-{% extends "base.html" %}
-
+{% extends "base.html" %} 
 {% block head %}
-
 <style>
-        .quiz-container {
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 50px auto;
-            max-width: 600px;
-        }
-        .timer {
-            border: 2px solid #007bff;
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .question-statement {
-            border: 2px solid #007bff;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-    </style>
-{% endblock %}
+  .qno {
+    height: 45px;
+    background-color: rgba(255, 255, 0, 0.441);
+    border-radius: 5px;
+    padding: 5px;
+  }
+  .timer {
+    height: 45px;
+    background-color: gray;
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+  }
+</style>
+{% endblock %} 
 
-{% block content%}
-    <div class="container">
-        <div class="quiz-container">
-            <h2 class="text-center">Start the Quiz</h2>
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    QNo. <span class="badge badge-success">3/15</span>
-                </div>
-                <div class="timer">
-                    00:13:52
-                </div>
-            </div>
-            <div class="question-statement">
-                .....Question Statement...
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="options" id="option1">
-                <label class="form-check-label" for="option1">
-                    1) Option....
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="options" id="option2">
-                <label class="form-check-label" for="option2">
-                    2) Option....
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="options" id="option3" checked>
-                <label class="form-check-label" for="option3">
-                    3) Option....
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="options" id="option4">
-                <label class="form-check-label" for="option4">
-                    4) Option....
-                </label>
-            </div>
-            <div class="d-flex justify-content-between mt-4">
-                <button class="btn btn-primary">Save and Next</button>
-                <button class="btn btn-success">Submit</button>
-            </div>
-        </div>
+{% block content %}
+<div class="container col-md-8 col-md-offset-4">
+  <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
+    <div class="d-flex justify-content-between mb-3">
+      <div class="qno">Questions: {{ quiz.questions|length }}</div>
+      <div class="timer">Time Left: {{ quiz.duration}}</div>
     </div>
+    <form class="from-content mt-3" method="Post">
+      {% for question in questions %}
+      <div class="form-control mb-2">
+        <div class="border border-primary rounded p-2 mb-2">
+          <p>{{question.id}}. {{question.question_stmt}}</p>
+        </div>
+        <div class="form-check">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              id="option"
+            />
+            <label class="form-check-label" for="option"
+              >{{question.option_a}}</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              id="option"
+            />
+            <label class="form-check-label" for="option"
+              >{{question.option_b}}</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              id="option"
+            />
+            <label class="form-check-label" for="option"
+              >{{question.option_c}}</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              id="option"
+            />
+            <label class="form-check-label" for="option"
+              >{{question.option_d}}</label
+            >
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      <div class="d-flex justify-content-center mt-3">
+        <button type="submit" class="btn btn-outline-success">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function updateTimer() {
+    const minutes = Math.floor(timer / 60);
+    const seconds = timer % 60;
+    document.getElementById("timer").innerText = `${minutes}:${
+      seconds < 10 ? "0" : ""
+    }${seconds}`;
+    if (timer <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById("quiz-form").submit();
+    }
+    timer--;
+  }
+
+  function showQuestion(index) {
+    document
+      .querySelectorAll(".question-statement, .form-check")
+      .forEach((element) => {
+        element.style.display = "none";
+      });
+    document.getElementById(`question-${index}`).style.display = "block";
+    document.getElementById(`options-${index}`).style.display = "block";
+    document.getElementById(
+      "question-number"
+    ).innerText = `${index}/${totalQuestions}`;
+    document.getElementById("prev-question").style.display =
+      index === 1 ? "none" : "inline-block";
+    document.getElementById("next-question").style.display =
+      index === totalQuestions ? "none" : "inline-block";
+    document.getElementById("submit-quiz").style.display =
+      index === totalQuestions ? "inline-block" : "none";
+  }
+
+  document.getElementById("next-question").addEventListener("click", () => {
+    if (currentQuestion < totalQuestions) {
+      currentQuestion++;
+      showQuestion(currentQuestion);
+    }
+  });
+
+  document.getElementById("prev-question").addEventListener("click", () => {
+    if (currentQuestion > 1) {
+      currentQuestion--;
+      showQuestion(currentQuestion);
+    }
+  });
+
+  document.getElementById("quiz-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    clearInterval(timerInterval);
+    fetch(e.target.action, {
+      method: "POST",
+      body: new FormData(e.target),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert(`Your score is ${data.score}`);
+        window.location.href = "{{ url_for('user') }}";
+      });
+  });
+
+  timerInterval = setInterval(updateTimer, 1000);
+  showQuestion(currentQuestion);
+</script>
 
 {% endblock %}

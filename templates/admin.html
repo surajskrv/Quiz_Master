@@ -81,7 +81,13 @@
             {% for chapter in subject.chapters %}
               <tr>
                 <td>{{chapter.name}}</td>
-                <td>{{ chapter.quizzes|length }}</td>
+                <td>
+                  {% set total_questions = 0 %}
+                  {% for quiz in chapter.quizzes %}
+                      {% set total_questions = total_questions + quiz.questions|length %}
+                  {% endfor %}
+                  {{ total_questions }}
+                </td>
                 <td>
                   <a href="/chapter/{{ chapter.id }}/edit" class="btn btn-outline-warning">Edit</a>
                   <a href="/chapter/{{ chapter.id }}/delete" class="btn btn-outline-danger">Delete</a>

@@ -1,55 +1,29 @@
 {% extends "base.html" %}
-
 {% block head %}
 <style>
-    .quiz-details {
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 50px auto;
-        max-width: 400px;
-    }
-    .quiz-details .row {
-        margin-bottom: 10px;
+    span {
+        display: inline-block;
+        width:200px;
+        align-items: center;
+        text-align: center;
+        border: 1px solid #17a2b8; 
+        padding: 2px 5px; 
+        border-radius: 5px;
     }
 </style>
-
 {% endblock %}
 
 {% block content %}
-
-    <div class="container">
-        <div class="quiz-details">
-            <h2 class="text-center mb-4">View the Quiz</h2>
-            <div class="row">
-                <div class="col-6 text-right"><strong>ID:</strong></div>
-                <div class="col-6">
-                    <input title="readonly" type="text" class="form-control" value="xx" readonly></div>
-            </div>
-            <div class="row">
-                <div class="col-6 text-right"><strong>Subject:</strong></div>
-                <div class="col-6"><input title="readonly" type="text" class="form-control" value="Mathematics" readonly></div>
-            </div>
-            <div class="row">
-                <div class="col-6 text-right"><strong>Chapter:</strong></div>
-                <div class="col-6"><input title="readonly" type="text" class="form-control" value="Random Variables" readonly></div>
-            </div>
-            <div class="row">
-                <div class="col-6 text-right"><strong>Number of Questions:</strong></div>
-                <div class="col-6"><input title="readonly" type="text" class="form-control" value="05" readonly></div>
-            </div>
-            <div class="row">
-                <div class="col-6 text-right"><strong>Scheduled Date:</strong></div>
-                <div class="col-6"><input title="readonly" type="text" class="form-control" value="dd/mm/yyyy" readonly></div>
-            </div>
-            <div class="row">
-                <div class="col-6 text-right"><strong>Duration(hh:mm):</strong></div>
-                <div class="col-6"><input title="readonly" type="text" class="form-control" value="00:10" readonly></div>
-            </div>
-            <div class="text-center mt-4">
-                <a href="/user" class="btn btn-outline-primary">Close</a>
-            </div>
-        </div>
+<div class="container col-md-4 col-md-offset-4">
+    <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
+        <h3 class="text-center">Quiz Details</h3>
+        <p>ID: <span>{{ quiz.id }}</span></p>
+        <p>Subject: <span>{{ subject.name }}</span></p>
+        <p>Chapter: <span>{{ chapter.name }}</span></p>
+        <p>No of Questions: <span>{{ quiz.questions|length }}</span></p>
+        <p>Scheduled Date: <span>{{ quiz.date }}</span></p>
+        <p>Duration(hh:mm): <span>{{ quiz.duration }}</span></p>
+        <a href="{{ url_for('user') }}" class="btn btn-outline-danger w-auto">Close</a>
     </div>
-
+</div>
 {% endblock %}
