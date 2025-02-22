@@ -82,11 +82,7 @@
               <tr>
                 <td>{{chapter.name}}</td>
                 <td>
-                  {% set total_questions = 0 %}
-                  {% for quiz in chapter.quizzes %}
-                      {% set total_questions = total_questions + quiz.questions|length %}
-                  {% endfor %}
-                  {{ total_questions }}
+                  {{chapter.no_of_questions}}
                 </td>
                 <td>
                   <a href="/chapter/{{ chapter.id }}/edit" class="btn btn-outline-warning">Edit</a>
@@ -99,6 +95,8 @@
           {% else %}
           <p class="card-text">No chapters found</p>
           {% endif %}
+          <a href="/subject/{{ subject.id }}/edit" class="btn btn-outline-warning float-start me-3">Edit</a>
+          <a href="/subject/{{ subject.id }}/delete" class="btn btn-outline-danger float-start">Delete</a>
           <a href="/new_chapter/{{ subject.id }}/" class="btn btn-outline-primary float-end">+ Chapter</a>
         </div>
       </div>

@@ -99,6 +99,8 @@
           {% else %}
           <p class="card-text">No Questions found</p>
           {% endif %}
+          <a href="/quiz/{{ quiz.id }}/edit" class="btn btn-outline-warning float-start me-3">Edit</a>
+          <a href="/quiz/{{ quiz.id }}/delete" class="btn btn-outline-danger float-start">Delete</a>
           <a href="/new_question/{{ quiz.id }}/" class="btn btn-outline-primary float-end">+ Question</a>
         </div>
       </div>

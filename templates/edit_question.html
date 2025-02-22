@@ -40,11 +40,11 @@
                     <div class="form-group row align-items-center mt-2">
                         <label for="option" class="form-label col-lg-3 ms-2">Correct Option:</label>
                         <select class="form-select w-auto h-auto me-2" name="correct_option" aria-label="Default select example" required value="{{question.correct_option}}">
-                            <option selected>{{question.correct_option}}</option>
-                            <option value="a">a</option>
-                            <option value="b">b</option>
-                            <option value="c">c</option>
-                            <option value="d">d</option>
+                            <option selected disabled required>correct_option</option>
+                            <option value="a" {% if question.correct_option == "a" %}selected{% endif %}>a</option>
+                            <option value="b" {% if question.correct_option == "b" %}selected{% endif %}>b</option>
+                            <option value="c" {% if question.correct_option == "c" %}selected{% endif %}>c</option>
+                            <option value="d" {% if question.correct_option == "d" %}selected{% endif %}>d</option>
                         </select>
                     </div>
                 </div>

@@ -1,0 +1,20 @@
+{% extends "base.html"%}
+
+{% block content %}
+   
+<div class="container col-md-4 col-md-offset-4">
+    <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
+        <h5 class="card-header">Edit Subject</h5>
+        <form method="post">
+            <div class="mb-3">
+                <label for="name" class="form-label" >Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ subject.name }}" required />
+                <label for="desc" class = "form-label">Description</label>
+                <input type="text" class="form-control" id="desc" name="desc" value="{{ subject.desc }}" required />
+            </div>
+            <button type="submit" title="save" class="btn btn-outline-success">Save</button>
+            <a href="/admin" class="btn btn-outline-danger">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

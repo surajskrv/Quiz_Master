@@ -31,55 +31,25 @@
           <p>{{question.id}}. {{question.question_stmt}}</p>
         </div>
         <div class="form-check">
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="flexRadioDefault"
-              id="option"
-            />
-            <label class="form-check-label" for="option"
-              >{{question.option_a}}</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="flexRadioDefault"
-              id="option"
-            />
-            <label class="form-check-label" for="option"
-              >{{question.option_b}}</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="flexRadioDefault"
-              id="option"
-            />
-            <label class="form-check-label" for="option"
-              >{{question.option_c}}</label
-            >
-          </div>
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="flexRadioDefault"
-              id="option"
-            />
-            <label class="form-check-label" for="option"
-              >{{question.option_d}}</label
-            >
-          </div>
+          <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_a_{{ question.id }}" value="a">
+          <label class="form-check-label" for="option_a_{{ question.id }}">{{question.option_a}}</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_b_{{ question.id }}" value="b">
+          <label class="form-check-label" for="option_b_{{ question.id }}">{{question.option_b}}</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_c_{{ question.id }}" value="c">
+          <label class="form-check-label" for="option_c_{{ question.id }}">{{question.option_c}}</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_d_{{ question.id }}" value="d">
+          <label class="form-check-label" for="option_d_{{ question.id }}">{{question.option_d}}</label>
         </div>
       </div>
       {% endfor %}
       <div class="d-flex justify-content-center mt-3">
-        <button type="submit" class="btn btn-outline-success">Submit</button>
+        <a href="/submit_quiz/{{ quiz.id }}" type="submit" class="btn btn-outline-success">Submit</a>
       </div>
     </form>
   </div>

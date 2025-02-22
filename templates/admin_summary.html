@@ -1,30 +1,11 @@
-{% extends "base.html" %} 
+{% extends "base.html" %} {% block head %}
+<style>
+  nav {
+    background-color: #e3f2fd;
+  }
+</style>
 
-{% block head %}
-  <style>
-    nav {
-      background-color: #e3f2fd;
-    }
-    .chart-container {
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      padding: 20px;
-      margin: 50px auto;
-      max-width: 800px;
-  }
-  .chart {
-      border: 1px solid #ddd;
-      padding: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-  }
-  .chart h3 {
-      margin-bottom: 20px;
-  }
-  </style>
-{% endblock %}
-
-{% block nav %}
+{% endblock %} {% block nav %}
 
 <nav class="navbar navbar-expand-lg navbar-light">
   <button
@@ -65,10 +46,67 @@
     <button class="btn btn-outline-success me-3" type="submit">Search</button>
   </form>
 </nav>
-  
-{% endblock %}
 
-{% block content %}
-<h3>This is admin Summary page</h3>
+{% endblock %} {% block content %}
+<div class="container mt-4">
+  <div class="row">
+      <div class="col-lg-6 m-3">
+        <h5 class="text-center">Subject wise Quiz Summary</h5>
+        <canvas id="bar"></canvas>
+      </div>
+      <div class="col-lg-4 m-3">
+        <h5 class="text-center">Month wise Quiz Summary</h5>
+        <canvas id="pie"></canvas>
+      </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const ctx = document.getElementById("bar");
+  const cte = document.getElementById("pie");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Maths", "Physics", "Chemistry"],
+      datasets: [
+        {
+          label: "subjects",
+          data: [12, 19, 3],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+
+  new Chart(cte, {
+    type: "pie",
+    data: {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [300, 50, 100],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }]
+    },
+  });
+</script>
 
 {% endblock %}
