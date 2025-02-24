@@ -1,8 +1,10 @@
-{% extends "base.html" %} {% block head %}
+{% extends "base.html" %} 
+
+{% block head %}
 
 <style>
   nav {
-    background-color: #e3f2fd;
+    background-color: #bee1fa;
   }
   .fixed-bottom-button {
     position: fixed;
@@ -42,26 +44,21 @@
         <a class="nav-link" href="/admin_summary">Summary</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" href="/admin/search">Search</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="/logout">Logout</a>
       </li>
     </ul>
   </div>
-  <form class="d-flex ms-2">
-    <input
-      class="form-control me-2"
-      type="search"
-      placeholder="Search"
-      aria-label="Search"
-    />
-    <button class="btn btn-outline-success me-3" type="submit">Search</button>
-  </form>
 </nav>
 
-{% endblock %} 
+{% endblock %}
 
 {% block content %} 
 <div class="container mb-5">
   <div class="row">
+    <h5 class="text-center">Subjects</h5>
     {% if subjects %} 
     {% for subject in subjects %}
     <div class="col-lg-6">
@@ -103,7 +100,6 @@
     </div>
     {% endfor %}
   </div>
-  
   {% endif %} 
   
 <!----------------------- If subjects are not present------------------------>

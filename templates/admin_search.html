@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+  nav {
+    background-color: #bee1fa;
+  }
+</style>
+{% endblock %} 
+
+{% block nav %}
+
+<nav class="navbar navbar-expand-lg navbar-light">
+  <button
+    class="navbar-toggler ms-2"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/admin">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin_quiz">Quiz</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin_summary">Summary</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/search">Search</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Admin Search</h2>
+    <form action="/admin/search" method="GET" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <select title="select" name="search_type" class="form-select">
+                    <option value="users" {% if search_type == 'users' %}selected{% endif %}>Users</option>
+                    <option value="subjects" {% if search_type == 'subjects' %}selected{% endif %}>Subjects</option>
+                    <option value="quizzes" {% if search_type == 'quizzes' %}selected{% endif %}>Quizzes</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="query" class="form-control" placeholder="Search..." value="{{ query }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </div>
+    </form>
+
+    {% if query %}
+        <h3>Search Results for "{{ query }}" ({{ search_type }})</h3>
+        {% if results %}
+            {% if search_type == 'users' %}
+                <ul class="list-group">
+                    {% for user in results %}
+                        <li class="list-group-item">{{ user.email }} - {{ user.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% elif search_type == 'subjects' %}
+                <ul class="list-group">
+                    {% for subject in results %}
+                        <li class="list-group-item">{{ subject.name }} - {{ subject.desc }}</li>
+                    {% endfor %}
+                </ul>
+            {% elif search_type == 'quizzes' %}
+                <ul class="list-group">
+                    {% for quiz in results %}
+                        <li class="list-group-item">Quiz Date: {{ quiz.date }} - Chapter: {{ quiz.chapter.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% else %}
+            <p>No results found.</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -434,3 +434,25 @@ def submit_quiz(qid):
         db.session.add(new_score)
     db.session.commit()
     return redirect(url_for('quiz_result', qid=quiz.id, score=score))
+
+
+@app.route("/admin/search", methods=['GET'])
+@login_required
+def admin_search():
+    query = request.args.get('query')
+    search_type = request.args.get('search_type')
+
+    results = []
+
+    if query:
+        if search_type == 'users':
+            results = User.query.filter(User.email.ilike(f"%{query}%")).all()
+        elif search_type == 'subjects':
+            results = Subject.query.filter(Subject.name.ilike(f"%{query}%")).all()
+        elif search_type == 'quizzes':
+            results = Quiz.query.join(Chapter).filter(Chapter.name.ilike(f"%{query}%")).all()
+        else:
+            flash("Please select a search type.", category='error')
+            return redirect(url_for('admin'))
+
+    return render_template('admin_search.html', user=current_user, results=results, query=query, search_type=search_type)
