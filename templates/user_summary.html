@@ -57,11 +57,11 @@
   new Chart(ctx, {
     type: "bar",
     data: {
-      labels: ["Maths", "Physics", "Chemistry"],
+      labels: {{ subject_labels | tojson | safe }},
       datasets: [
         {
-          label: "subjects",
-          data: [12, 19, 3],
+          label: "Quizzes per Subject",
+          data: {{ subject_data | tojson | safe }},
           borderWidth: 1,
         },
       ],
@@ -78,14 +78,10 @@
   new Chart(cte, {
     type: "pie",
     data: {
-      labels: [
-        'Red',
-        'Blue',
-        'Yellow'
-      ],
+      labels: {{ month_labels | tojson | safe }},
       datasets: [{
-        label: 'My First Dataset',
-        data: [300, 50, 100],
+        label: 'Quizzes per Month',
+        data: {{ month_data | tojson | safe }},
         backgroundColor: [
           'rgb(255, 99, 132)',
           'rgb(54, 162, 235)',

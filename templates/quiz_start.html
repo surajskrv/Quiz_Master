@@ -1,67 +1,57 @@
-{% extends "base.html" %} 
-{% block head %}
-<style>
-  .qno {
-    height: 45px;
-    background-color: rgba(255, 255, 0, 0.441);
-    border-radius: 5px;
-    padding: 5px;
-  }
-  .timer {
-    height: 45px;
-    background-color: gray;
-    color: white;
-    border-radius: 5px;
-    padding: 5px;
-  }
-</style>
-{% endblock %} 
+{% extends "base.html" %}
 
 {% block content %}
 <div class="container col-md-8 col-md-offset-4">
   <div class="card border-info shadow-lg p-3 mb-5 bg-white rounded mt-3">
     <div class="d-flex justify-content-between mb-3">
-      <div class="qno">Questions: {{ quiz.questions|length }}</div>
-      <div class="timer">Time Left: {{ quiz.duration}}</div>
+      <div class="border border-warning bg-warning rounded p-1 mb-3">Questions: {{ quiz.questions|length }}</div>
+      <div class="border-danger bg-danger text-white rounded p-2 mb-3">
+        <span id="timer">{{ quiz.duration }}:00</span>
+      </div>
+      <div class="border border-info bg-info rounded p-1 mb-3">
+        Duration: {{ quiz.duration }}
+      </div>
     </div>
-    <form class="from-content mt-3" method="Post">
-      {% for question in questions %}
+    <form id="quiz-form" method="POST" action="/submit_quiz/{{ quiz.id }}">
+      {% for question in quiz.questions %}
       <div class="form-control mb-2">
         <div class="border border-primary rounded p-2 mb-2">
-          <p>{{question.id}}. {{question.question_stmt}}</p>
+          <p>{{ question.id }}. {{ question.question_stmt }}</p>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_a_{{ question.id }}" value="a">
-          <label class="form-check-label" for="option_a_{{ question.id }}">{{question.option_a}}</label>
+          <label class="form-check-label" for="option_a_{{ question.id }}">{{ question.option_a }}</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_b_{{ question.id }}" value="b">
-          <label class="form-check-label" for="option_b_{{ question.id }}">{{question.option_b}}</label>
+          <label class="form-check-label" for="option_b_{{ question.id }}">{{ question.option_b }}</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_c_{{ question.id }}" value="c">
-          <label class="form-check-label" for="option_c_{{ question.id }}">{{question.option_c}}</label>
+          <label class="form-check-label" for="option_c_{{ question.id }}">{{ question.option_c }}</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_d_{{ question.id }}" value="d">
-          <label class="form-check-label" for="option_d_{{ question.id }}">{{question.option_d}}</label>
+          <label class="form-check-label" for="option_d_{{ question.id }}">{{ question.option_d }}</label>
         </div>
       </div>
       {% endfor %}
       <div class="d-flex justify-content-center mt-3">
-        <a href="/submit_quiz/{{ quiz.id }}" type="submit" class="btn btn-outline-success">Submit</a>
+        <button type="submit" class="btn btn-outline-success">Submit</button>
+        <a href="/user" class="btn btn-outline-danger ms-2">Cancel</a>
       </div>
     </form>
   </div>
 </div>
 
 <script>
+  let timer = {{ quiz.duration * 60 }};
+  const timerElement = document.getElementById("timer");
+
   function updateTimer() {
     const minutes = Math.floor(timer / 60);
     const seconds = timer % 60;
-    document.getElementById("timer").innerText = `${minutes}:${
-      seconds < 10 ? "0" : ""
-    }${seconds}`;
+    timerElement.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     if (timer <= 0) {
       clearInterval(timerInterval);
       document.getElementById("quiz-form").submit();
@@ -69,55 +59,6 @@
     timer--;
   }
 
-  function showQuestion(index) {
-    document
-      .querySelectorAll(".question-statement, .form-check")
-      .forEach((element) => {
-        element.style.display = "none";
-      });
-    document.getElementById(`question-${index}`).style.display = "block";
-    document.getElementById(`options-${index}`).style.display = "block";
-    document.getElementById(
-      "question-number"
-    ).innerText = `${index}/${totalQuestions}`;
-    document.getElementById("prev-question").style.display =
-      index === 1 ? "none" : "inline-block";
-    document.getElementById("next-question").style.display =
-      index === totalQuestions ? "none" : "inline-block";
-    document.getElementById("submit-quiz").style.display =
-      index === totalQuestions ? "inline-block" : "none";
-  }
-
-  document.getElementById("next-question").addEventListener("click", () => {
-    if (currentQuestion < totalQuestions) {
-      currentQuestion++;
-      showQuestion(currentQuestion);
-    }
-  });
-
-  document.getElementById("prev-question").addEventListener("click", () => {
-    if (currentQuestion > 1) {
-      currentQuestion--;
-      showQuestion(currentQuestion);
-    }
-  });
-
-  document.getElementById("quiz-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    clearInterval(timerInterval);
-    fetch(e.target.action, {
-      method: "POST",
-      body: new FormData(e.target),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        alert(`Your score is ${data.score}`);
-        window.location.href = "{{ url_for('user') }}";
-      });
-  });
-
-  timerInterval = setInterval(updateTimer, 1000);
-  showQuestion(currentQuestion);
+  const timerInterval = setInterval(updateTimer, 1000);
 </script>
-
 {% endblock %}

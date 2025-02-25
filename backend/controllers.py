@@ -4,6 +4,9 @@ from flask_login import login_user, logout_user, login_required, current_user
 from backend.models import *
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from sqlalchemy import func, distinct
+from collections import defaultdict
+
 
 # ----------------- Custom Decorators ----------------------------
 
@@ -95,7 +98,7 @@ def logout():
 
 @app.route("/admin")
 @login_required
-# @admin_required
+@admin_required
 def admin():
     subjects = Subject.query.order_by(Subject.id).all()
     chapters = Chapter.query.order_by(Chapter.id).all()
@@ -115,22 +118,57 @@ def admin_quiz():
 @app.route("/admin_summary")
 @login_required
 def admin_summary():
-    chapters = Chapter.query.all()
-    chapters_count = {}
-    for chapter in chapters:
-        chapters_count[chapter.name] = len(chapter.quizzes)
-    chapter_labels = list(chapters_count.keys())
-    chapter_data = list(chapters_count.values())
-    month_quiz_counts = {
-        "January": 15,
-        "February": 8,
-        "March": 22,
-        "April": 12,
-        "May": 18,
-    }
-    month_labels = list(month_quiz_counts.keys())
-    month_data = list(month_quiz_counts.values())
-    return render_template('admin_summary.html', user=current_user, chapter_labels=chapter_labels, chapter_data=chapter_data, month_labels=month_labels, month_data=month_data)
+    # Fetch subject-wise top scores
+    max_scores = db.session.query(Subject.name, func.max(Score.score).label('max_score')).\
+        join(Chapter, Subject.id == Chapter.subject_id).\
+        join(Quiz, Chapter.id == Quiz.chapter_id).\
+        join(Score, Quiz.id == Score.quiz_id).\
+        group_by(Subject.name).all()
+
+    subject_users = defaultdict(list)
+    for subject, max_score in max_scores:
+        users = db.session.query(User.name).\
+            join(Score, User.id == Score.user_id).\
+            join(Quiz, Score.quiz_id == Quiz.id).\
+            join(Chapter, Quiz.chapter_id == Chapter.id).\
+            join(Subject, Chapter.subject_id == Subject.id).\
+            filter(Subject.name == subject, Score.score == max_score).all()
+        subject_users[subject] = [user[0] for user in users]
+
+    # Fetch subject-wise user attempts
+    subject_attempts = db.session.query(Subject.name, func.count(Score.id).label('attempts')).\
+        join(Chapter, Subject.id == Chapter.subject_id).\
+        join(Quiz, Chapter.id == Quiz.chapter_id).\
+        join(Score, Quiz.id == Score.quiz_id).\
+        group_by(Subject.name).all()
+
+    # Prepare data for charts
+    subject_labels = [subject for subject, _ in max_scores]
+    top_scores = [max_score for _, max_score in max_scores]
+    attempts = [attempts for _, attempts in subject_attempts]
+
+    return render_template('admin_summary.html', user=current_user, subject_users=subject_users, max_scores=max_scores, subject_labels=subject_labels, top_scores=top_scores, attempts=attempts)
+
+@app.route("/admin/search", methods=['GET'])
+@login_required
+def admin_search():
+    query = request.args.get('query')
+    search_type = request.args.get('search_type')
+
+    results = []
+
+    if query:
+        if search_type == 'users':
+            results = User.query.filter(User.email.ilike(f"%{query}%")).all()
+        elif search_type == 'subjects':
+            results = Subject.query.filter(Subject.name.ilike(f"%{query}%")).all()
+        elif search_type == 'quizzes':
+            results = Quiz.query.join(Chapter).filter(Chapter.name.ilike(f"%{query}%")).all()
+        else:
+            flash("Please select a search type.", category='error')
+            return redirect(url_for('admin'))
+
+    return render_template('admin_search.html', user=current_user, results=results, query=query, search_type=search_type)
 
 @app.route("/new_subject", methods=['POST', 'GET'])
 @login_required
@@ -396,8 +434,26 @@ def user_scores():
 @app.route("/user_summary")
 @login_required
 def user_summary():
-    
-    return render_template('user_summary.html', user=current_user)
+    # Fetch subject-wise quiz summary
+    subject_summary = db.session.query(Subject.name, func.count(Score.id)).\
+        join(Chapter, Subject.id == Chapter.subject_id).\
+        join(Quiz, Chapter.id == Quiz.chapter_id).\
+        join(Score, Quiz.id == Score.quiz_id).\
+        filter(Score.user_id == current_user.id).\
+        group_by(Subject.name).all()
+
+    # Fetch month-wise quiz summary
+    month_summary = db.session.query(func.strftime('%Y-%m', Score.date), func.count(Score.id)).\
+        filter(Score.user_id == current_user.id).\
+        group_by(func.strftime('%Y-%m', Score.date)).all()
+
+    subject_labels = [subject for subject, _ in subject_summary]
+    subject_data = [count for _, count in subject_summary]
+
+    month_labels = [month for month, _ in month_summary]
+    month_data = [count for _, count in month_summary]
+
+    return render_template('user_summary.html', user=current_user, subject_labels=subject_labels, subject_data=subject_data, month_labels=month_labels, month_data=month_data)
 
 @app.route("/quiz_view/<int:qid>/")
 @login_required
@@ -421,7 +477,7 @@ def submit_quiz(qid):
     questions = quiz.questions
     score = 0
     for question in questions:
-        user_answer = request.form.get(f'question-{question.id}')
+        user_answer = request.form.get(f'question_{question.id}')
         if user_answer == question.correct_option:
             score += 1
     today = datetime.now().date()
@@ -435,24 +491,9 @@ def submit_quiz(qid):
     db.session.commit()
     return redirect(url_for('quiz_result', qid=quiz.id, score=score))
 
-
-@app.route("/admin/search", methods=['GET'])
+@app.route("/quiz_result/<int:qid>/<int:score>")
 @login_required
-def admin_search():
-    query = request.args.get('query')
-    search_type = request.args.get('search_type')
-
-    results = []
-
-    if query:
-        if search_type == 'users':
-            results = User.query.filter(User.email.ilike(f"%{query}%")).all()
-        elif search_type == 'subjects':
-            results = Subject.query.filter(Subject.name.ilike(f"%{query}%")).all()
-        elif search_type == 'quizzes':
-            results = Quiz.query.join(Chapter).filter(Chapter.name.ilike(f"%{query}%")).all()
-        else:
-            flash("Please select a search type.", category='error')
-            return redirect(url_for('admin'))
-
-    return render_template('admin_search.html', user=current_user, results=results, query=query, search_type=search_type)
+def quiz_result(qid, score):
+    quiz = Quiz.query.get_or_404(qid)
+    total_questions = len(quiz.questions)
+    return render_template('quiz_result.html', user=current_user, quiz=quiz, score=score, total_questions=total_questions)
