@@ -30,31 +30,34 @@ def home():
 # ------------- login ------------
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        
-        if not email:
-            flash("Email is required.", category='error')
-        elif not password:
-            flash("Password is required.", category='error')
-        else:
-            user = User.query.filter_by(email=email).first()
-            if not user:
-                flash("User does not exist.", category='error')  
-            elif check_password_hash(user.password, password):
-                if user.role == 0:
-                    flash("Logged in", category='success')
-                    login_user(user, remember=True)
-                    current_user.authenticated = True
-                    return redirect('/admin')
-                elif user.role == 1:
-                    flash("Logged in", category='success')
-                    login_user(user, remember=True)
-                    current_user.authenticated = True
-                    return redirect('/user')
+    try:
+        if request.method == 'POST':
+            email = request.form['email']
+            password = request.form['password']
+            
+            if not email:
+                flash("Email is required.", category='error')
+            elif not password:
+                flash("Password is required.", category='error')
             else:
-                    flash("Password is incorrect.", category='error')
+                user = User.query.filter_by(email=email).first()
+                if not user:
+                    flash("User does not exist.", category='error')  
+                elif check_password_hash(user.password, password):
+                    if user.role == 0:
+                        flash("Logged in", category='success')
+                        login_user(user, remember=True)
+                        current_user.authenticated = True
+                        return redirect('/admin')
+                    elif user.role == 1:
+                        flash("Logged in", category='success')
+                        login_user(user, remember=True)
+                        current_user.authenticated = True
+                        return redirect('/user')
+                else:
+                        flash("Password is incorrect.", category='error')
+    except:
+        return redirect('/login')
     return render_template('login.html', user=current_user)
 
 # ----------------- Signup -------------------
@@ -98,7 +101,7 @@ def logout():
 
 @app.route("/admin")
 @login_required
-@admin_required
+# @admin_required
 def admin():
     subjects = Subject.query.order_by(Subject.id).all()
     chapters = Chapter.query.order_by(Chapter.id).all()
@@ -118,7 +121,6 @@ def admin_quiz():
 @app.route("/admin_summary")
 @login_required
 def admin_summary():
-    # Fetch subject-wise top scores
     max_scores = db.session.query(Subject.name, func.max(Score.score).label('max_score')).\
         join(Chapter, Subject.id == Chapter.subject_id).\
         join(Quiz, Chapter.id == Quiz.chapter_id).\
@@ -135,14 +137,12 @@ def admin_summary():
             filter(Subject.name == subject, Score.score == max_score).all()
         subject_users[subject] = [user[0] for user in users]
 
-    # Fetch subject-wise user attempts
     subject_attempts = db.session.query(Subject.name, func.count(Score.id).label('attempts')).\
         join(Chapter, Subject.id == Chapter.subject_id).\
         join(Quiz, Chapter.id == Quiz.chapter_id).\
         join(Score, Quiz.id == Score.quiz_id).\
         group_by(Subject.name).all()
 
-    # Prepare data for charts
     subject_labels = [subject for subject, _ in max_scores]
     top_scores = [max_score for _, max_score in max_scores]
     attempts = [attempts for _, attempts in subject_attempts]
@@ -409,7 +409,6 @@ def delete_question(qid):
 @app.route("/user")
 @login_required
 def user():
-    today = datetime.now().date()
     quizzes = Quiz.query.order_by(Quiz.date).all()
     return render_template("user.html", user=current_user, quizzes = quizzes)
 
@@ -434,7 +433,6 @@ def user_scores():
 @app.route("/user_summary")
 @login_required
 def user_summary():
-    # Fetch subject-wise quiz summary
     subject_summary = db.session.query(Subject.name, func.count(Score.id)).\
         join(Chapter, Subject.id == Chapter.subject_id).\
         join(Quiz, Chapter.id == Quiz.chapter_id).\
@@ -442,7 +440,6 @@ def user_summary():
         filter(Score.user_id == current_user.id).\
         group_by(Subject.name).all()
 
-    # Fetch month-wise quiz summary
     month_summary = db.session.query(func.strftime('%Y-%m', Score.date), func.count(Score.id)).\
         filter(Score.user_id == current_user.id).\
         group_by(func.strftime('%Y-%m', Score.date)).all()
@@ -468,7 +465,16 @@ def quiz_view(qid):
 def quiz_start(qid):
     quiz = Quiz.query.get_or_404(qid)
     questions = quiz.questions
-    return render_template('quiz_start.html', user=current_user, quiz=quiz, questions=questions)
+    duration_str = quiz.duration
+    try:
+        time = duration_str.split(':')
+        hours = int(time[0])
+        minutes = int(time[1])
+        total_seconds = hours * 3600 + minutes * 60
+    except ValueError:
+        total_seconds = 0
+
+    return render_template('quiz_start.html', user=current_user, quiz=quiz, questions=questions,duration_seconds=total_seconds)
 
 @app.route("/submit_quiz/<int:qid>", methods=['POST'])
 @login_required
