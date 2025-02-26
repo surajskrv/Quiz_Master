@@ -5,6 +5,12 @@
     nav {
         background-color: #bee1fa;
     }
+    .summary-container {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
 </style>
 {% endblock %}
 
@@ -15,21 +21,11 @@
     </button>
     <div class="collapse navbar-collapse mx-4" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="/admin">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/admin_quiz">Quiz</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/admin_summary">Summary</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/search">Search</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/logout">Logout</a>
-            </li>
+            <li class="nav-item active"><a class="nav-link" href="/admin">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/admin_quiz">Quiz</a></li>
+            <li class="nav-item"><a class="nav-link" href="/admin_summary">Summary</a></li>
+            <li class="nav-item"><a class="nav-link" href="/admin/search">Search</a></li>
+            <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
         </ul>
     </div>
 </nav>
@@ -37,25 +33,56 @@
 
 {% block content %}
 <div class="container mt-4">
+    <h2 class="text-center">Admin Summary</h2>
     <div class="row">
-        <div class="col-lg-6 m-3">
-            <h5 class="text-center">Subject Wise Top Scores</h5>
-            <canvas id="bar"></canvas>
+        <div class="col-lg-6 mb-3">
+            <div class="summary-container">
+                <h5 class="text-center">Top Scores Per Subject</h5>
+                <canvas id="barChart"></canvas>
+            </div>
         </div>
-        <div class="col-lg-4 m-3">
-            <h5 class="text-center">Subject Wise User Attempts</h5>
-            <canvas id="pie"></canvas>
+        
+        <div class="col-lg-6 ">
+            <div class="summary-container">
+                <h5 class="text-center">Quiz Attempts Per Subject</h5>
+                <canvas id="pieChart"></canvas>
+            </div>
         </div>
+    </div>
+
+    <!-- Top Scoring Users -->
+    <div class="mt-4 summary-container mb-5 table-responsive">
+        <h5 class="text-center">Top Scorers Per Subject</h5>
+        {% if subject_users %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Top Scorers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject, users in subject_users.items() %}
+                        <tr>
+                            <td>{{ subject }}</td>
+                            <td>{{ users | join(', ') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-center">No data available.</p>
+        {% endif %}
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const ctx = document.getElementById("bar");
-    const cte = document.getElementById("pie");
+    const barCtx = document.getElementById("barChart");
+    const pieCtx = document.getElementById("pieChart");
 
-    new Chart(ctx, {
+    new Chart(barCtx, {
         type: "bar",
         data: {
             labels: {{ subject_labels | tojson | safe }},
@@ -64,37 +91,25 @@
                 maxBarThickness: 35,
                 label: "Top Scores",
                 data: {{ top_scores | tojson | safe }},
-                borderWidth: 1,
                 backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(255, 205, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(201, 203, 207, 0.2)'
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)'
                 ],
-                borderColor: [
-                'rgb(255, 99, 132)',
-                'rgb(255, 159, 64)',
-                'rgb(255, 205, 86)',
-                'rgb(75, 192, 192)',
-                'rgb(54, 162, 235)',
-                'rgb(153, 102, 255)',
-                'rgb(201, 203, 207)'
-                ],
-            }],
+                borderWidth: 1
+            }]
         },
         options: {
+            responsive: true,
             scales: {
-            y: {
-                beginAtZero: true,
-            },
-            },
-        },
+                y: { beginAtZero: true }
+            }
+        }
     });
 
-    new Chart(cte, {
+    new Chart(pieCtx, {
         type: "doughnut",
         data: {
             labels: {{ subject_labels | tojson | safe }},
@@ -111,6 +126,9 @@
                 hoverOffset: 4
             }]
         },
+        options: {
+            responsive: true
+        }
     });
 </script>
 {% endblock %}

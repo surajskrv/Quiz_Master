@@ -9,57 +9,42 @@
 {% endblock %} 
 
 {% block nav %}
-
 <nav class="navbar navbar-expand-lg navbar-light">
-  <button
-    class="navbar-toggler  mx-4"
-    type="button"
-    data-toggle="collapse"
-    data-target="#navbarSupportedContent"
-    aria-controls="navbarSupportedContent"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-  >
+  <button title="button" class="navbar-toggler mx-4" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse mx-4" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/admin">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin_quiz">Quiz</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin_summary">Summary</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/search">Search</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/logout">Logout</a>
-      </li>
+      <li class="nav-item"><a class="nav-link" href="/admin">Home</a></li>
+      <li class="nav-item"><a class="nav-link" href="/admin_quiz">Quiz</a></li>
+      <li class="nav-item"><a class="nav-link" href="/admin_summary">Summary</a></li>
+      <li class="nav-item"><a class="nav-link" href="/admin/search">Search</a></li>
+      <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
     </ul>
   </div>
 </nav>
-
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Admin Search</h2>
+    <h2 class="text-center mb-4">Search</h2>
+
+    <!-- Search Form -->
     <form action="/admin/search" method="GET" class="mb-4">
-        <div class="row">
+        <div class="row g-3 align-items-center">
             <div class="col-md-4">
-                <select title="select" name="search_type" class="form-select">
+                <select name="search_type" class="form-select" title="Select Search Type">
+                    <option value="" disabled>Select Type</option>
                     <option value="users" {% if search_type == 'users' %}selected{% endif %}>Users</option>
                     <option value="subjects" {% if search_type == 'subjects' %}selected{% endif %}>Subjects</option>
+                    <option value="chapters" {% if search_type == 'chapters' %}selected{% endif %}>Chapters</option>
                     <option value="quizzes" {% if search_type == 'quizzes' %}selected{% endif %}>Quizzes</option>
+                    <option value="questions" {% if search_type == 'questions' %}selected{% endif %}>Questions</option>
                 </select>
             </div>
             <div class="col-md-6">
-                <input type="text" name="query" class="form-control" placeholder="Search..." value="{{ query }}">
+                <input type="text" name="query" class="form-control" placeholder="Enter or (Leave blank for full list)" value="{{ query }}">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Search</button>
@@ -67,30 +52,84 @@
         </div>
     </form>
 
-    {% if query %}
-        <h3>Search Results for "{{ query }}" ({{ search_type }})</h3>
+    <!-- Search Results -->
+    {% if search_type %}
+        <h4 class="mt-4">
+            {% if query %}
+                Search Results for "<strong>{{ query }}</strong>" in <strong>{{ search_type | capitalize }}</strong>
+            {% else %}
+                Showing <strong>All {{ search_type | capitalize }}</strong>
+            {% endif %}
+        </h4>
+
         {% if results %}
             {% if search_type == 'users' %}
-                <ul class="list-group">
-                    {% for user in results %}
-                        <li class="list-group-item">{{ user.email }} - {{ user.name }}</li>
-                    {% endfor %}
-                </ul>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Qualification</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in results %}
+                            <tr>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.qualification }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
             {% elif search_type == 'subjects' %}
                 <ul class="list-group">
                     {% for subject in results %}
-                        <li class="list-group-item">{{ subject.name }} - {{ subject.desc }}</li>
+                        <li class="list-group-item"><strong>{{ subject.name }}</strong> - {{ subject.desc }}</li>
                     {% endfor %}
                 </ul>
-            {% elif search_type == 'quizzes' %}
+
+            {% elif search_type == 'chapters' %}
                 <ul class="list-group">
-                    {% for quiz in results %}
-                        <li class="list-group-item">Quiz Date: {{ quiz.date }} - Chapter: {{ quiz.chapter.name }}</li>
+                    {% for chapter in results %}
+                        <li class="list-group-item"><strong>{{ chapter.name }}</strong> - {{ chapter.desc }} (Subject: {{ chapter.subject.name }})</li>
                     {% endfor %}
                 </ul>
+
+            {% elif search_type == 'quizzes' %}
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Quiz Date</th>
+                            <th>Time Duration</th>
+                            <th>Chapter</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for quiz in results %}
+                            <tr>
+                                <td>{{ quiz.date }}</td>
+                                <td>{{ quiz.duration }}</td>
+                                <td>{{ quiz.chapter.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            {% elif search_type == 'questions' %}
+                <ul class="list-group">
+                    {% for question in results %}
+                        <li class="list-group-item"><strong>{{ question.question_stmt }}</strong>
+                            <br>Options: {{ question.option_a }}, {{ question.option_b }}, {{ question.option_c }}, {{ question.option_d }}
+                            <br>Answer: {{ question.correct_option }}
+                        </li>
+                    {% endfor %}
+                </ul>
+
             {% endif %}
         {% else %}
-            <p>No results found.</p>
+            <p class="text-muted">No results found.</p>
         {% endif %}
     {% endif %}
 </div>

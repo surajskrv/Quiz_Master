@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from backend.models import *
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from sqlalchemy import func, distinct
+from sqlalchemy import func, or_
 from collections import defaultdict
 
 @app.route('/')
@@ -108,55 +108,69 @@ def admin_quiz():
 @app.route("/admin_summary")
 @login_required
 def admin_summary():
-    max_scores = db.session.query(Subject.name, func.max(Score.score).label('max_score')).\
-        join(Chapter, Subject.id == Chapter.subject_id).\
-        join(Quiz, Chapter.id == Quiz.chapter_id).\
-        join(Score, Quiz.id == Score.quiz_id).\
-        group_by(Subject.name).all()
+    max_scores = (
+        db.session.query(Subject.name, func.max(Score.score).label("max_score"))
+        .join(Chapter, Subject.id == Chapter.subject_id)
+        .join(Quiz, Chapter.id == Quiz.chapter_id)
+        .join(Score, Quiz.id == Score.quiz_id)
+        .group_by(Subject.name)
+        .all()
+    )
 
     subject_users = defaultdict(list)
     for subject, max_score in max_scores:
-        users = db.session.query(User.name).\
-            join(Score, User.id == Score.user_id).\
-            join(Quiz, Score.quiz_id == Quiz.id).\
-            join(Chapter, Quiz.chapter_id == Chapter.id).\
-            join(Subject, Chapter.subject_id == Subject.id).\
-            filter(Subject.name == subject, Score.score == max_score).all()
-        subject_users[subject] = [user[0] for user in users]
+        users = (
+            db.session.query(User.name)
+            .join(Score, User.id == Score.user_id)
+            .join(Quiz, Score.quiz_id == Quiz.id)
+            .join(Chapter, Quiz.chapter_id == Chapter.id)
+            .join(Subject, Chapter.subject_id == Subject.id)
+            .filter(Subject.name == subject, Score.score == max_score)
+            .all()
+        )
+        subject_users[subject] = [user.name for user in users]
 
-    subject_attempts = db.session.query(Subject.name, func.count(Score.id).label('attempts')).\
-        join(Chapter, Subject.id == Chapter.subject_id).\
-        join(Quiz, Chapter.id == Quiz.chapter_id).\
-        join(Score, Quiz.id == Score.quiz_id).\
-        group_by(Subject.name).all()
+    subject_attempts = (
+        db.session.query(Subject.name, func.count(Score.id).label("attempts"))
+        .join(Chapter, Subject.id == Chapter.subject_id)
+        .join(Quiz, Chapter.id == Quiz.chapter_id)
+        .join(Score, Quiz.id == Score.quiz_id)
+        .group_by(Subject.name)
+        .all()
+    )
 
     subject_labels = [subject for subject, _ in max_scores]
     top_scores = [max_score for _, max_score in max_scores]
     attempts = [attempts for _, attempts in subject_attempts]
 
-    return render_template('admin_summary.html', user=current_user, subject_users=subject_users, max_scores=max_scores, subject_labels=subject_labels, top_scores=top_scores, attempts=attempts)
+    return render_template(
+        "admin_summary.html",
+        user=current_user,
+        subject_users=subject_users,
+        max_scores=max_scores,
+        subject_labels=subject_labels,
+        top_scores=top_scores,
+        attempts=attempts,
+    )
 
 # Admin Search Page
-@app.route("/admin/search", methods=['GET'])
-@login_required
+@app.route('/admin/search', methods=['GET'])
 def admin_search():
-    query = request.args.get('query')
-    search_type = request.args.get('search_type')
-
-    results = []
-
-    if query:
-        if search_type == 'users':
-            results = User.query.filter(User.email.ilike(f"%{query}%")).all()
-        elif search_type == 'subjects':
-            results = Subject.query.filter(Subject.name.ilike(f"%{query}%")).all()
-        elif search_type == 'quizzes':
-            results = Quiz.query.join(Chapter).filter(Chapter.name.ilike(f"%{query}%")).all()
-        else:
-            flash("Please select a search type.", category='error')
-            return redirect(url_for('admin'))
-
-    return render_template('admin_search.html', user=current_user, results=results, query=query, search_type=search_type)
+    search_type = request.args.get('search_type', '')
+    query = request.args.get('query', '').strip()
+    if search_type == 'users':
+        results = User.query.filter(User.name.contains(query) | User.email.contains(query)).all() if query else User.query.all()
+    elif search_type == 'subjects':
+        results = Subject.query.filter(Subject.name.contains(query)).all() if query else Subject.query.all()
+    elif search_type == 'chapters':
+        results = Chapter.query.filter(Chapter.name.contains(query)).all() if query else Chapter.query.all()
+    elif search_type == 'quizzes':
+        results = Quiz.query.filter(Quiz.date.contains(query)).all() if query else Quiz.query.all()
+    elif search_type == 'questions':
+        results = Question.query.filter(Question.question_stmt.contains(query)).all() if query else Question.query.all()
+    else:
+        results = []
+    return render_template('admin_search.html', search_type=search_type, query=query, results=results)
 
 # Admin New Subject Page
 @app.route("/new_subject", methods=['POST', 'GET'])
