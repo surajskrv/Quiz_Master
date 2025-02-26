@@ -33,19 +33,16 @@
    cd quiz-master-v1
    ```
 2. **Create a virtual environment & install dependencies:**
-   ```
-1. open the terminal
-2. change the directory to the current app directory
-3. create a environment --> python -m venv .foldername
-4. Activating the environment --> .foldername/Scripts/Activate
-5. install the required packages from the file --> pip install -r 'file.txt'
-6. if you want to check the packages --> pip freeze
-   ```
+    1. open the terminal
+    2. change the directory to the current app directory
+    3. create a environment
+    ```python -m venv .foldername```
+    4. Activating the environment ``` .foldername/Scripts/Activate ```
+    5. install the required packages from the file ``` pip install -r 'file.txt' ```
+    6. if you want to check the packages ``` pip freeze ```
 
 3. **Run the application:**
-   ```
-   python app.py
-   ```
+   ```python app.py ```
 
 ## 🔑 User Roles & Authentication
 
