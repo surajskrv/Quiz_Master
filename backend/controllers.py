@@ -1,10 +1,10 @@
 from flask import current_app as app
-from flask import render_template, redirect, request, flash, url_for
+from flask import render_template, redirect, request, flash, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
 from backend.models import *
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from sqlalchemy import func, or_
+from sqlalchemy import func
 from collections import defaultdict
 
 @app.route('/')
@@ -508,3 +508,14 @@ def quiz_result(qid, score):
     quiz = Quiz.query.get_or_404(qid)
     total_questions = len(quiz.questions)
     return render_template('quiz_result.html', user=current_user, quiz=quiz, score=score, total_questions=total_questions)
+
+# ----------------- Error Handling ----------------------------
+
+@app.errorhandler(404)
+def page_not_found(e):
+    if current_user.is_authenticated:
+        if current_user.role == 0:
+            return redirect(url_for("admin"))
+        elif current_user.role == 1:
+            return redirect(url_for("user"))
+    return render_template("lost.html"), 404
