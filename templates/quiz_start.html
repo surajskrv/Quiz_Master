@@ -6,10 +6,10 @@
     <div class="d-flex justify-content-between mb-3">
       <div class="border border-warning bg-warning rounded p-1 mb-3">Questions: {{ quiz.questions|length }}</div>
       <div class="border-danger bg-danger text-white rounded p-2 mb-3">
-        <span id="timer">{{ duration_seconds }}</span>
+        Time Left: <span id="timer">{{ duration_seconds }}</span>
       </div>
       <div class="border border-info bg-info rounded p-1 mb-3">
-        Duration: {{ quiz.duration }}
+        Duration (hh:mm): {{ quiz.duration }}
       </div>
     </div>
     <form id="quiz-form" method="POST" action="/submit_quiz/{{ quiz.id }}">

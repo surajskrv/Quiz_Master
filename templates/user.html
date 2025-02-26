@@ -8,7 +8,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light">
   <button
-    class="navbar-toggler"
+    class="navbar-toggler mx-4"
     type="button"
     data-toggle="collapse"
     data-target="#navbarSupportedContent"
@@ -19,7 +19,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+  <div class="collapse navbar-collapse mx-4" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
         <a class="nav-link" href="/user">Home</a>
@@ -39,7 +39,7 @@
 
 {% endblock %} {% block content %}
 <div class="container mt-5">
-  <div class="card shadow-lg bg-white p-4 rounded">
+  <div class="card shadow-lg bg-white p-4 rounded table-responsive">
     <h3 class="text-center">All Quizzes</h3>
     <table class="table table-striped">
       {% if quizzes %} 
