@@ -7,20 +7,6 @@ from datetime import datetime
 from sqlalchemy import func, distinct
 from collections import defaultdict
 
-
-# ----------------- Custom Decorators ----------------------------
-
-def admin_required(func):
-    def wrapper(*args, **kwargs):
-        if current_user.role == 0:
-            return func(*args, **kwargs)
-        else:
-            flash("You are not authorized to access this page.", category='error')
-            return redirect('/user')
-    return wrapper
-
-#--------------------- end ---------------------------------------
-
 @app.route('/')
 def home():
     return render_template('home.html', user=current_user)
@@ -99,9 +85,9 @@ def logout():
 
 # --------------------- Admin Routes -------------------------------------
 
+# Admin dashboard
 @app.route("/admin")
 @login_required
-# @admin_required
 def admin():
     subjects = Subject.query.order_by(Subject.id).all()
     chapters = Chapter.query.order_by(Chapter.id).all()
@@ -110,14 +96,15 @@ def admin():
         setattr(chapter, 'no_of_questions', no_of_questions)
     return render_template("admin.html", user=current_user, subjects=subjects, chapters = chapters)
 
+# Admin Quiz Page
 @app.route("/admin_quiz")
 @login_required
-# @admin_required
 def admin_quiz():
     quizzes = Quiz.query.order_by(Quiz.id).all()
     questions = Question.query.order_by(Question.id).all()
     return render_template('admin_quiz.html', user=current_user, quizzes=quizzes, questions=questions)
 
+# Admin Summary Page
 @app.route("/admin_summary")
 @login_required
 def admin_summary():
@@ -149,6 +136,7 @@ def admin_summary():
 
     return render_template('admin_summary.html', user=current_user, subject_users=subject_users, max_scores=max_scores, subject_labels=subject_labels, top_scores=top_scores, attempts=attempts)
 
+# Admin Search Page
 @app.route("/admin/search", methods=['GET'])
 @login_required
 def admin_search():
@@ -170,9 +158,9 @@ def admin_search():
 
     return render_template('admin_search.html', user=current_user, results=results, query=query, search_type=search_type)
 
+# Admin New Subject Page
 @app.route("/new_subject", methods=['POST', 'GET'])
 @login_required
-# @admin_required
 def new_subject():
     if request.method == 'POST':
         name = request.form['name']
@@ -191,9 +179,9 @@ def new_subject():
             flash("Both fields are required", category='error')
     return render_template("new_subject.html", user=current_user)
 
+# Admin New Chapter Page
 @app.route("/new_chapter/<int:subject_id>/", methods=['POST', 'GET'])
 @login_required
-# @admin_required
 def new_chapter(subject_id):
     subject = Subject.query.filter_by(id =subject_id).first()
     if request.method == 'POST':
@@ -213,9 +201,9 @@ def new_chapter(subject_id):
             flash("Both fields are required", category='error')
     return render_template("new_chapter.html", user=current_user)
 
+# Admin New Quiz Page
 @app.route("/new_quiz", methods=['POST', 'GET'])
 @login_required
-# @admin_required
 def new_quiz():
     chapters = Chapter.query.order_by(Chapter.id).all()
     if request.method == 'POST':
@@ -241,9 +229,9 @@ def new_quiz():
             flash("All fields are required", category='error')
     return render_template("new_quiz.html", user=current_user, chapters=chapters)
 
+# Admin New Question Page
 @app.route('/new_question/<int:quiz_id>/', methods=['GET', 'POST'])
 @login_required
-# @admin_required
 def new_question(quiz_id):
     if request.method == 'POST':
         title = request.form['title']
@@ -276,7 +264,6 @@ def new_question(quiz_id):
 
 @app.route('/subject/<sid>/edit', methods=['GET', 'POST'])
 @login_required
-# @admin_required
 def edit_subject(sid):
     subject = Subject.query.get_or_404(sid)
     if request.method == 'POST':
@@ -289,7 +276,6 @@ def edit_subject(sid):
 
 @app.route('/chapter/<cid>/edit', methods=['GET', 'POST'])
 @login_required
-# @admin_required
 def edit_chapter(cid):
     chapter = Chapter.query.get_or_404(cid)
     if request.method == 'POST':
@@ -302,7 +288,6 @@ def edit_chapter(cid):
 
 @app.route('/quiz/<qid>/edit', methods=['GET', 'POST'])
 @login_required
-# @admin_required
 def edit_quiz(qid):
     quiz = Quiz.query.get_or_404(qid)
     chapters = Chapter.query.order_by(Chapter.id).all()
@@ -319,7 +304,6 @@ def edit_quiz(qid):
 
 @app.route('/question/<qid>/edit', methods=['GET', 'POST'])
 @login_required
-# @admin_required
 def edit_question(qid):
     question = Question.query.get_or_404(qid)
     if request.method == 'POST':
@@ -345,6 +329,7 @@ def delete_subject(sid):
             subject = Subject.query.get_or_404(sid)
             for chapter in Chapter.query.filter_by(subject_id=sid).all():
                 for quiz in Quiz.query.filter_by(chapter_id=chapter.id).all():
+                    Score.query.filter_by(quiz_id=quiz.id).delete()
                     Question.query.filter_by(quiz_id=quiz.id).delete()
                     db.session.delete(quiz)
                 db.session.delete(chapter)
@@ -357,12 +342,12 @@ def delete_subject(sid):
 
 @app.route('/chapter/<cid>/delete', methods=["GET", "POST"])
 @login_required
-# @admin_required
 def delete_chapter(cid):
     if request.method == "GET":
         try:
             chapter = Chapter.query.get_or_404(cid)
             for quiz in Quiz.query.filter_by(chapter_id=cid).all(): 
+                Score.query.filter_by(quiz_id=quiz.id).delete()
                 Question.query.filter_by(quiz_id=quiz.id).delete()
                 db.session.delete(quiz) 
             db.session.delete(chapter) 
@@ -374,11 +359,11 @@ def delete_chapter(cid):
             
 @app.route('/quiz/<qid>/delete', methods=["GET", "POST"])
 @login_required
-# @admin_required
 def delete_quiz(qid):
     if request.method == "GET":
         try:
             quiz = Quiz.query.get_or_404(qid)
+            Score.query.filter_by(quiz_id=quiz.id).delete()
             Question.query.filter_by(quiz_id=qid).delete()
             db.session.delete(quiz)
             db.session.commit()
@@ -390,7 +375,6 @@ def delete_quiz(qid):
 
 @app.route('/question/<qid>/delete', methods=['GET', 'POST'])
 @login_required
-# @admin_required
 def delete_question(qid):
     if request.method == 'GET':
         try:
@@ -406,12 +390,14 @@ def delete_question(qid):
 
 # -------------------- User Routes --------------------------------
 
+# User Dashboard
 @app.route("/user")
 @login_required
 def user():
     quizzes = Quiz.query.order_by(Quiz.date).all()
     return render_template("user.html", user=current_user, quizzes = quizzes)
 
+# User Scores Page
 @app.route('/user_scores')
 @login_required
 def user_scores():
@@ -430,6 +416,7 @@ def user_scores():
                 })
     return render_template('user_scores.html', user=current_user, scores=score_data)
 
+# User Summary Page
 @app.route("/user_summary")
 @login_required
 def user_summary():
@@ -452,6 +439,7 @@ def user_summary():
 
     return render_template('user_summary.html', user=current_user, subject_labels=subject_labels, subject_data=subject_data, month_labels=month_labels, month_data=month_data)
 
+# Quiz view page for user
 @app.route("/quiz_view/<int:qid>/")
 @login_required
 def quiz_view(qid):
@@ -460,6 +448,7 @@ def quiz_view(qid):
     subject = chapter.subject
     return render_template('quiz_view.html', user=current_user, quiz=quiz, chapter=chapter, subject=subject)
 
+# quiz start page for user
 @app.route("/quiz_start/<int:qid>/")
 @login_required
 def quiz_start(qid):
@@ -476,6 +465,7 @@ def quiz_start(qid):
 
     return render_template('quiz_start.html', user=current_user, quiz=quiz, questions=questions,duration_seconds=total_seconds)
 
+# quiz submission page for user
 @app.route("/submit_quiz/<int:qid>", methods=['POST'])
 @login_required
 def submit_quiz(qid):
@@ -497,6 +487,7 @@ def submit_quiz(qid):
     db.session.commit()
     return redirect(url_for('quiz_result', qid=quiz.id, score=score))
 
+# Quiz result page
 @app.route("/quiz_result/<int:qid>/<int:score>")
 @login_required
 def quiz_result(qid, score):

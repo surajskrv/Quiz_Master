@@ -1,17 +1,21 @@
-{% extends "base.html" %} 
-
-{% block head %}
-  <style>
-    nav {
-      background-color:  #BBDED6;
-    }
-  </style>
-{% endblock %}
-
-{% block nav %}
+{% extends "base.html" %} {% block head %}
+<style>
+  nav {
+    background-color: #bbded6;
+  }
+</style>
+{% endblock %} {% block nav %}
 
 <nav class="navbar navbar-expand-lg navbar-light">
-  <button class="navbar-toggler ms-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+  <button
+    class="navbar-toggler ms-2"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
     <span class="navbar-toggler-icon"></span>
   </button>
 
@@ -32,20 +36,18 @@
     </ul>
   </div>
 </nav>
-  
-{% endblock %}
 
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-4">
   <div class="row">
-      <div class="col-lg-6 m-3">
-        <h5 class="text-center">Subject wise Quiz Summary</h5>
-        <canvas id="bar"></canvas>
-      </div>
-      <div class="col-lg-4 m-3">
-        <h5 class="text-center">Month wise Quiz Summary</h5>
-        <canvas id="pie"></canvas>
-      </div>
+    <div class="col-lg-6 m-3">
+      <h5 class="text-center">Subject wise no. of quizzes</h5>
+      <canvas id="bar"></canvas>
+    </div>
+    <div class="col-lg-4 m-3">
+      <h5 class="text-center">Month wise no. of quiz attempts</h5>
+      <canvas id="pie"></canvas>
+    </div>
   </div>
 </div>
 
@@ -60,9 +62,29 @@
       labels: {{ subject_labels | tojson | safe }},
       datasets: [
         {
+          barThickness: 30,
+                maxBarThickness: 35,
           label: "Quizzes per Subject",
           data: {{ subject_data | tojson | safe }},
           borderWidth: 1,
+          backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(255, 205, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(201, 203, 207, 0.2)'
+                ],
+                borderColor: [
+                'rgb(255, 99, 132)',
+                'rgb(255, 159, 64)',
+                'rgb(255, 205, 86)',
+                'rgb(75, 192, 192)',
+                'rgb(54, 162, 235)',
+                'rgb(153, 102, 255)',
+                'rgb(201, 203, 207)'
+                ],
         },
       ],
     },

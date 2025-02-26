@@ -8,6 +8,4 @@ WTForms
 SQLAlchemy
 Jinja2
 Werkzeug
-email_validator
-itsdangerous
 bcrypt
